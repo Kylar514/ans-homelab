@@ -1,0 +1,47 @@
+#SPDX-License-Identifier: MIT-0
+#---
+# tasks file for clone_repos
+
+- name: Clone or update repositories
+  git:
+    repo: '{{ item.url }}'
+    dest: '{{ item.dest }}'
+    version: "{{ item.branch | default('master') }}"
+    update: yes
+    force: no
+  become_user: '{{ ansible_user }}'
+  loop: '{{ ansible }}'
+  when: "'ansible_control' in group_names"
+
+- name: Clone or update repositories
+  git:
+    repo: '{{ item.url }}'
+    dest: '{{ item.dest }}'
+    version: "{{ item.branch | default('master') }}"
+    update: yes
+    force: no
+  become_user: '{{ ansible_user }}'
+  loop: '{{ docker }}'
+  when: "'docker_hosts' in group_names"
+
+- name: Clone or update repositories
+  git:
+    repo: '{{ item.url }}'
+    dest: '{{ item.dest }}'
+    version: "{{ item.branch | default('master') }}"
+    update: yes
+    force: no
+  become_user: '{{ ansible_user }}'
+  loop: '{{ all }}'
+  when: "'all' in group_names"
+
+- name: Clone or update repositories
+  git:
+    repo: '{{ item.url }}'
+    dest: '{{ item.dest }}'
+    version: "{{ item.branch | default('master') }}"
+    update: yes
+    force: no
+  become_user: '{{ ansible_user }}'
+  loop: '{{ staging }}'
+  when: "'staging' in group_names"

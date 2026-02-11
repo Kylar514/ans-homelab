@@ -1,0 +1,78 @@
+# SPDX-License-Identifier: MIT-0
+---
+# tasks file for docker
+
+- name: Create /etc/apt/keyrings directory
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+
+- name: Download Docker GPG key
+  get_url:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    dest: /etc/apt/keyrings/docker.asc
+    mode: '0644'
+    force: false
+
+- name: Get system architecture
+  command: dpkg --print-architecture
+  register: dpkg_arch
+  changed_when: false
+
+- name: Get Ubuntu codename
+  command: lsb_release -cs
+  register: lsb_codename
+  changed_when: false
+
+- name: Add Docker apt repository
+  apt_repository:
+    repo: >-
+      deb [arch={{ dpkg_arch.stdout }} signed-by=/etc/apt/keyrings/docker.asc]
+      https://download.docker.com/linux/ubuntu
+      {{ lsb_codename.stdout }} stable
+    state: present
+    filename: docker
+
+- name: Install Docker CE packages
+  apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+    update_cache: yes
+
+- name: Ensure Docker service is enabled and started
+  service:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Ensure dockersvc group exists
+  group:
+    name: dockersvc
+    gid: '{{dockersvc_gid}}'
+    state: present
+    system: yes
+  when: "'docker_hosts' in group_names"
+- name: Ensure dockersvc user exists
+  user:
+    name: dockersvc
+    uid: '{{dockersvc_uid}}'
+    group: dockersvc
+    state: present
+    home: '{{docker_data_dir}}'
+    system: yes
+    shell: /usr/sbin/nologin
+  when: "'docker_hosts' in group_names"
+
+- name: Ensure zeal is in docker group
+  user:
+    name: zeal
+    groups: docker
+    append: yes
+    state: present
+  when: "'docker_hosts' in group_names"

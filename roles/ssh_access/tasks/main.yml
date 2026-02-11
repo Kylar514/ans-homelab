@@ -1,0 +1,13 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for ssh_access
+- name: Compile and set authorized_keys for users
+  template:
+    src: authorized_keys.j2
+    dest: '/home/{{ item.name }}/.ssh/authorized_keys'
+    owner: '{{ item.name }}'
+    group: '{{ item.name }}'
+    mode: '0600'
+  vars:
+    pubkeys: '{{ item.pubkeys }}'
+  loop: '{{ ssh_users }}'

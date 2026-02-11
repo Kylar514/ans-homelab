@@ -1,0 +1,4 @@
+# Managed by Ansible - do not edit manually
+{% for key in pubkeys %}
+{{ lookup('file', role_path + '/files/' + key) }}
+{% endfor %}

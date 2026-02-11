@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: MIT-0
+---
+# handlers file for set_keychain
+
+- name: Enable and start ansible-keychain
+  ansible.builtin.systemd:
+    name: ansible-keychain.service
+    state: started
+    enabled: true
+    scope: user
+  become_user: '{{ ansible_user }}'

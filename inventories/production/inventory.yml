@@ -1,0 +1,46 @@
+---
+all:
+  hosts:
+    azir:
+      ansible_host: 10.0.40.11
+      ansible_user: zeal
+    ryze:
+      ansible_host: 10.0.40.4
+      ansible_user: zeal
+    zilean:
+      ansible_host: 10.0.40.8
+      ansible_user: zeal
+    kennen:
+      ansible_host: 10.0.40.9
+      ansible_user: zeal
+
+  children:
+    docker_hosts:
+      hosts:
+        ryze: {}
+        zilean: {}
+        kennen: {}
+
+    traefik_hosts:
+      hosts:
+        ryze:
+          traefik_role: primary
+        zilean:
+          traefik_role: backup
+
+    pi_hosts:
+      hosts:
+        ryze: {}
+
+    vm_hosts:
+      hosts:
+        zilean: {}
+        kennen: {}
+
+    ansible_control:
+      hosts:
+        azir: {}
+
+    production:
+      children:
+        docker_hosts: {}

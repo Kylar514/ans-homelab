@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: MIT-0
+---
+# Configures UFW on all managed hosts.
+# Baseline: deny incoming, allow outgoing, SSH always open.
+# Per-service rules are added via ufw_rules in group_vars or host_vars.
+- name: UFW firewall setup
+  hosts: all
+  become: true
+  roles:
+    - ufw

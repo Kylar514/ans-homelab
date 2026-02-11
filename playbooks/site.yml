@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: MIT-0
+---
+# Full environment converge — imports all playbooks in dependency order.
+# Runs against whichever inventory is active (production or staging/tst).
+#
+# Usage:
+#   Production:  ansible-playbook playbooks/site.yml --ask-vault-pass
+#   Staging/tst: ansible-playbook playbooks/site.yml -i inventories/staging --ask-vault-pass
+
+- import_playbook: base.yml
+- import_playbook: ufw.yml
+- import_playbook: docker.yml
+- import_playbook: vip_failover.yml
+- import_playbook: maintain.yml

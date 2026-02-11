@@ -1,0 +1,26 @@
+#SPDX-License-Identifier: MIT-0
+#---
+# defaults file for clone_repos
+all: []
+Each entry:
+  - url: https://github.com/kylar514/server-config.git
+    dest: /home/{{ansible_user}}/
+    branch: master
+
+ansible: []
+Each entry:
+  - url: https://github.com/kylar514/ans-homelab.git
+    dest: /home/{{ansible_user}}/
+    branch: master
+
+docker: []
+Each entry:
+  - url: https://github.com/kylar514/docker-services.git
+    dest: /home/{{ansible_user}}/
+    branch: master
+
+staging: []
+Each entry:
+  - url: https://github.com/kylar514/docker-services.git
+    dest: /home/{{ansible_user}}/
+    branch: test

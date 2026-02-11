@@ -1,0 +1,16 @@
+#SPDX-License-Identifier: MIT-0
+---
+# defaults file for sys_packages
+
+base_packages:
+  - ufw
+  - curl
+  - vim
+  - unattended-upgrades
+  - ca-certificates
+  - gnupg
+
+ansible_control_node:
+  - ansible
+  - keychain
+  - git

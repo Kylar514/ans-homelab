@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: MIT-0
+---
+# Azir self-maintenance — imported by site.yml so Azir converges itself on every poll.
+# Never run directly. Targets ansible_control only.
+#
+# Usage (via site.yml):
+#   ansible-playbook playbooks/site.yml --vault-password-file ~/.ansible_vault_pass
+
+- name: Maintain Azir control node
+  hosts: ansible_control
+  become: true
+  roles:
+    - set_keychain
+    - set_ci

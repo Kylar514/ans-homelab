@@ -1,0 +1,27 @@
+---
+all:
+  hosts:
+    heimerdinger:
+      ansible_host: 10.0.40.10
+      ansible_user: zeal
+
+  children:
+    docker_hosts:
+      hosts:
+        heimerdinger: {}
+
+    traefik_hosts:
+      hosts:
+        heimerdinger:
+          traefik_role: primary
+
+    pi_hosts:
+      hosts:
+
+    vm_hosts:
+      hosts:
+        heimerdinger: {}
+
+    production:
+      children:
+        docker_hosts: {}

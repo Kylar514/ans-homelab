@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: MIT-0
+---
+# Base system configuration applied to all managed hosts.
+# Covers: SSH key management, system packages, unattended upgrades, and service users.
+
+- name: Base system setup
+  hosts: all
+  become: true
+  roles:
+    - timezone
+    - ssh_access
+    - sys_packages
+    - unattended_upgrades

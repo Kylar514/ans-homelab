@@ -1,0 +1,16 @@
+# Managed by Ansible - do not edit manually
+[Unit]
+Description=Load ansible SSH key into ssh-agent via keychain
+After=default.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+Environment="SSH_ASKPASS={{ keychain_askpass_script }}"
+Environment="SSH_ASKPASS_REQUIRE=force"
+Environment="DISPLAY="
+ExecStartPre=/usr/bin/keychain --quiet --agents ssh
+ExecStart=/bin/bash -c 'source /home/{{ ansible_user }}/.keychain/$(hostname)-sh && ssh-add {{ keychain_ssh_key }}'
+
+[Install]
+WantedBy=default.target
