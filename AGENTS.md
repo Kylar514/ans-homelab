@@ -6,21 +6,41 @@ This file provides context for agentic coding agents working in this repository.
 
 ## Repository Overview
 
-Ansible automation for a self-managing homelab infrastructure. The goal is a
-fully declarative, Git-driven infrastructure where Azir (the Ansible control
-node) polls GitHub for changes and converges all hosts automatically.
+Ansible automation for a self-managing homelab infrastructure powered by self-hosted
+GitHub Actions runners on Azir (the Ansible control node).
 
 - **Control node:** Azir (`10.0.40.11`) — manages all other hosts
 - **Remote user:** `zeal` (has sudo on all hosts)
 - **SSH key:** `~/.ssh/ansible` (ed25519, passphrase-protected)
 - **Target OS:** Ubuntu jammy / noble
-- **Hostnames:** League of Legends champion names (azir, ryze, zilean, kennen,
-  heimerdinger, etc.)
+- **Hostnames:** League of Legends champion names (azir, ryze, zilean, kennen, heimerdinger)
 - **Min Ansible version:** 2.14
 
 ---
 
+## CI/CD Workflows
+
+All workflows run on self-hosted GitHub Actions runners on Azir.
+
+| Workflow | Trigger | Action |
+|----------|---------|--------|
+| **Test CI/CD** | Push to `test` branch | SSH into heimerdinger (staging), pull `test` branch, run `site.yml` with staging inventory |
+| **Ansible Test** | Pull request to `master` / push to `test` | Syntax check + dry run (`--check --diff`) against production inventory |
+| **Prod CI/CD** | Push to `master` branch | SSH into prod hosts (azir, ryze, zilean, kennen), pull `master`, run `site.yml` |
+| **Nightly** | Schedule (daily 02:00 UTC) | Run against test → if success, run against prod → if fail, trigger notification (placeholder) |
+
+### Workflow Behavior
+
+- **Test CI/CD**: Targets only staging host (heimerdinger), uses `inventories/staging/inventory.yml`
+- **Prod CI/CD**: Targets all production hosts, uses `inventories/production/inventory.yml`
+- **Ansible Test**: Runs `ansible-playbook --syntax-check` + `ansible-playbook --check --diff` against production inventory. Does NOT execute any changes, only validates syntax and shows pending changes
+- **Nightly**: First runs staging playbook, waits for result. On success, runs production playbook. On failure, exits without running prod (notification hook commented out, ready to enable)
+
+---
+
 ## Commands
+
+### Local Development
 
 ```bash
 # Full converge — production (default inventory in ansible.cfg)
@@ -31,7 +51,6 @@ ansible-playbook playbooks/site.yml -i inventories/staging \
   --vault-password-file ~/.ansible_vault_pass
 
 # Bootstrap Azir as control node (run once from desktop after Terraform)
-# Playbook name subject to change
 ansible-playbook playbooks/ansible_setup.yml --private-key ~/.ssh/homelab \
   --vault-password-file ~/.ansible_vault_pass
 
@@ -72,31 +91,34 @@ ansible-vault view inventories/production/group_vars/ansible_control/vault.yml
 
 ```
 ans-homelab/
-  ansible.cfg                     # private_key_file, inventory, vault_password_file
-  bootstrap-azir.sh               # Legacy bootstrap script — being replaced by Ansible
-  AGENTS.md                       # This file
+  .github/
+    workflows/                 # GitHub Actions workflows (future)
+  ansible.cfg                 # private_key_file, inventory, vault_password_file
+  AGENTS.md                   # This file
   playbooks/
-    site.yml                      # Master converge — imports all playbooks in order
-    base.yml                      # SSH keys, packages, upgrades — targets all hosts
-    ansible_setup.yml             # Azir control node setup — subject to rename/split
-    ufw.yml                       # Firewall rules — SSH always unconditionally allowed
-    docker.yml                    # Docker CE + dockersvc user/group — docker_hosts only
-    vip_failover.yml              # Keepalived VIP failover — traefik_hosts only
+    site.yml                  # Master converge — imports all playbooks in order
+    base.yml                  # SSH keys, packages, upgrades — targets all hosts
+    ansible_setup.yml         # Azir control node setup
+    ufw.yml                   # Firewall rules — SSH always unconditionally allowed
+    docker.yml                # Docker CE + dockersvc user/group — docker_hosts only
+    vip_failover.yml          # Keepalived VIP failover — traefik_hosts only
+    maintain.yml              # Self-maintenance (keychain reload, etc.)
   roles/
-    ssh_access/                   # authorized_keys managed via Jinja2 template
-    sys_packages/                 # Base packages + ansible_control conditional packages
-    unattended_upgrades/          # Automatic security updates
-    ufw/                          # UFW firewall — SSH rule is unconditional task
-    docker/                       # Docker CE install, dockersvc group/user, zeal→docker
-    vip_failover/                 # Keepalived config template + restart handler
-    clone_repos/                  # STUB — generic git clone/update role
-    set_secrets/                  # STUB — write vault secrets to disk (any host)
-    set_keychain/                 # STUB — configure keychain in .bash_profile
-    set_cron/                     # STUB — manage cron jobs from a variable list
+    ssh_access/               # authorized_keys managed via Jinja2 template
+    sys_packages/             # Base packages + ansible_control conditional packages
+    unattended_upgrades/      # Automatic security updates
+    ufw/                      # UFW firewall — SSH rule is unconditional task
+    docker/                   # Docker CE install, dockersvc group/user
+    vip_failover/             # Keepalived config template + restart handler
+    clone_repos/              # Generic git clone/update role
+    secrets/                  # Write vault secrets to disk (any host)
+    keychain/                 # Configure keychain + SSH key loading on login
+    timezone/                 # Set system timezone
+    actions_runner/           # [IN PROGRESS] Self-hosted GitHub Actions runner
   inventories/
-    production/                   # azir, ryze, zilean, kennen
-    staging/                      # heimerdinger
-    dmz/                          # empty skeleton — future use
+    production/               # azir, ryze, zilean, kennen
+    staging/                  # heimerdinger
+    dmz/                      # Future use
 ```
 
 ---
@@ -163,8 +185,8 @@ ans-homelab/
   - `vars.yml` — plain variables
   - `vault.yml` — ansible-vault encrypted secrets
 - `vault_password_file = ~/.ansible_vault_pass` set in `ansible.cfg` on Azir
-- Vault pass file written to Azir by `set_secrets` role during bootstrap
-- Never commit unencrypted secrets — `.gitignore` excludes known plaintext secret files
+- Vault pass file written to Azir by `secrets` role during bootstrap
+- GitHub Actions workflows access vault password via repository secrets
 
 ---
 
@@ -181,39 +203,33 @@ ans-homelab/
 
 ---
 
+## In Progress
+
+### `actions_runner` Role
+- Installs and configures self-hosted GitHub Actions runner on target hosts
+- Variables:
+  - `actions_runner_version`: Runner version to install
+  - `actions_runner_group`: Runner group name
+  - `actions_runner_repo_url`: Repository URL to register with
+- Tasks:
+  - Download and extract runner archive
+  - Create dedicated user (optional)
+  - Configure runner with auth token
+  - Install as systemd service
+- Handler: `Restart actions_runner` to restart the service
+
+---
+
 ## Roadmap & Future Work
 
-### In Progress (stub roles exist, need implementation)
-- `set_secrets` — write any vault secret to disk on any host
-- `set_keychain` — configure keychain + SSH key loading on login via `.bash_profile`
-- `clone_repos` — clone/update any list of git repos (data-driven via `repos:` variable)
-- `set_cron` — manage any cron jobs from a variable list (`cron_jobs:` variable)
-- Ansible bootstrap playbook (name subject to change) — one-time Azir setup from desktop
-  using homelab key (injected by Terraform), includes copying ansible private key to Azir
-- Ansible maintain playbook (name subject to change) — ongoing self-maintenance,
-  imported by `site.yml` so Azir converges itself on every CI/CD run, excludes key copy
-- `group_vars/ansible_control/vars.yml` + `vault.yml` — control node config and secrets
-
-### Planned — CI/CD Self-Managing Loop
-- Azir polls GitHub every 5 minutes via bash script (managed by `set_cron` role)
-- Two repos monitored:
-  - `ans-homelab` — `main` branch → production inventory, `test` branch → staging inventory
-  - `docker-services` (separate repo) → triggers `deploy-services.yml`
-- On change: `git pull` → run appropriate playbook with vault password file
-- `@reboot` cron runs ansible maintain playbook to reload SSH key into keychain using
-  vault-stored passphrase — no human input needed after initial bootstrap
-- Polling script deployed via `set_cron` role from a Jinja2 template
-
-### Planned — Docker Services Repo (`kylar514/docker-services`)
+### Docker Services Repo (`kylar514/docker-services`)
 - Separate GitHub repo for all Docker Compose files and service configs
 - Structure:
   - `core/` — traefik, adguard, adguardhome-sync (deploys to `traefik_hosts`)
   - `services/kennen/` — vaultwarden, arr-stack, torrent, omnitools, IT tools
   - `media/nasus/` — jellyfin (GPU passthrough, stays on NAS)
-- Static config files committed to repo — changes flow through Git → Ansible → server
-- adguardhome-sync runs as sidecar on ryze, syncs AdGuard config to all replicas via API
-  (DNS rewrites, filter lists, rewrites managed through AdGuard UI — not in Git)
 - Compose files deploy to `/opt/<service-name>/` on target hosts
+- Workflows will trigger service deployments on this repo
 
 ### Planned — Ansible Roles
 - `deploy_services` — copy compose files to `/opt/<service>/`, run `docker compose up -d --remove-orphans`
@@ -229,6 +245,3 @@ ans-homelab/
 ### Planned — Infrastructure
 - `nasus` added to inventory as `media_hosts` group
 - DMZ inventory populated — webhook receiver once DMZ network is configured
-- GitHub webhooks replace polling once DMZ is set up
-- Woodpecker CI or Gitea Actions on Azir replaces bash polling script (validates
-  ansible-lint and compose files on PR before merging to main)
