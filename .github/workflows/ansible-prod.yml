@@ -11,7 +11,8 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
-      - name: Run site.yml
+      - name: Source SSH agent environment
         run: |
+          source ~/.keychain/azir-sh
           ansible-playbook playbooks/site.yml \
             --vault-password-file ~/.ansible_vault_pass
