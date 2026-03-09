@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: MIT-0
+---
+galaxy_info:
+  role_name: git_config
+  description: Configures git credential store and distributes GitHub PATs fleet-wide
+  license: MIT-0
+  min_ansible_version: "2.14"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - jammy
+        - noble
+
+dependencies: []

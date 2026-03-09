@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: MIT-0
+---
+# tasks file for actions_runner service deployment (included)
+
+- name: "Deploy systemd service unit for {{ runner_repo.name }}"
+  ansible.builtin.template:
+    src: actions-runner.service.j2
+    dest: "/home/{{ ansible_user }}/.config/systemd/user/actions-runner-{{ runner_repo.name }}.service"
+    owner: '{{ ansible_user }}'
+    group: '{{ ansible_user }}'
+    mode: '0644'

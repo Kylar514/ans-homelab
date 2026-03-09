@@ -10,5 +10,4 @@
   hosts: ansible_control
   become: true
   roles:
-    - set_keychain
-    - set_ci
+    - keychain

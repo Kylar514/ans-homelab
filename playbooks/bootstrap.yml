@@ -1,0 +1,34 @@
+# SPDX-License-Identifier: MIT-0
+---
+# Run Site.yml first.  Than this.
+# Initial fleet bootstrap — run once from your local machine to provision all hosts.
+# Also used for key rotation: re-run after updating vault variables.
+# NEVER called by site.yml — this is a manual operation only.
+#
+# What this does:
+#   Play 1 (all hosts): configure git credentials from vault, clone repos, symlink dotfiles
+#   Play 2 (Azir only): deliver SSH key + vault pass, set up keychain, register Actions runner
+#
+# Prerequisites on your local machine:
+#   ~/.ssh/ansible        — ed25519 Ansible SSH key (passphrase-protected)
+#   ~/.ansible_vault_pass — vault password file
+#   vault variables populated and encrypted:
+#     inventories/production/group_vars/all/vault.yml        → vault_github_pat
+#     inventories/production/group_vars/ansible_control/vault.yml → vault_github_runner_pat
+#
+# Usage (first run / key rotation):
+#   ansible-playbook playbooks/bootstrap.yml --private-key ~/.ssh/homelab \
+#     --vault-password-file ~/.ansible_vault_pass
+#
+# Force runner re-registration (after rotating vault_github_runner_pat):
+#   ansible-playbook playbooks/bootstrap.yml --private-key ~/.ssh/homelab \
+#     --vault-password-file ~/.ansible_vault_pass \
+#     -e actions_runner_force_reregister=true
+
+- name: Bootstrap Azir — SSH key, vault pass, keychain, and Actions runner
+  hosts: ansible_control
+  become: true
+  roles:
+    - secrets
+    - keychain
+    - actions_runner

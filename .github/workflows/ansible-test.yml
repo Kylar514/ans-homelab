@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: MIT-0
+---
+name: Ansible Test
+
+on:
+  push:
+    branches: [test]
+  pull_request:
+    branches: [master]
+
+jobs:
+  test:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - name: Syntax check
+        run: ansible-playbook playbooks/site.yml --syntax-check
+      - name: Dry run against prod
+        run: |
+          ansible-playbook playbooks/site.yml \
+            --check --diff \
+            --vault-password-file ~/.ansible_vault_pass

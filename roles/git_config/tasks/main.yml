@@ -1,0 +1,33 @@
+# SPDX-License-Identifier: MIT-0
+---
+# tasks file for git_config
+# Configures git credential store and writes ~/.git-credentials on every managed host.
+# On ansible_control (Azir) also writes ~/.github_runner_pat for runner registration.
+# vault_github_pat must be defined (group_vars/all/vault.yml).
+# vault_github_runner_pat must be defined on ansible_control (group_vars/ansible_control/vault.yml).
+
+- name: Configure git credential helper store
+  community.general.git_config:
+    name: credential.helper
+    scope: global
+    value: store
+  become_user: '{{ ansible_user }}'
+
+- name: Write git credentials file
+  ansible.builtin.template:
+    src: git-credentials.j2
+    dest: '{{ git_config_credentials_file }}'
+    owner: '{{ ansible_user }}'
+    group: '{{ ansible_user }}'
+    mode: '0600'
+  no_log: true
+
+- name: Write GitHub runner PAT file
+  ansible.builtin.copy:
+    content: '{{ vault_github_runner_pat }}'
+    dest: '{{ git_config_runner_pat_file }}'
+    owner: '{{ ansible_user }}'
+    group: '{{ ansible_user }}'
+    mode: '0600'
+  no_log: true
+  when: "'ansible_control' in group_names"

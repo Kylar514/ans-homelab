@@ -2,27 +2,24 @@
 ---
 # group_vars for ansible_control — CI/CD pipeline configuration
 
+# Repos cloned on Azir — overrides group_vars/all repos (replace behaviour).
+
+repos:
+  - name: ans-homelab
+    url: 'https://github.com/Kylar514/ans-homelab.git'
+    dest: '/home/{{ ansible_user }}/ans-homelab'
+    branch: master
+  - name: server-config
+    url: 'https://github.com/Kylar514/server-config.git'
+    dest: '/home/{{ ansible_user }}/server-config'
+    branch: master
+
+# CI/CD pipeline repo definitions — reference data for GitHub Actions workflows on Azir.
+
 ci_repos:
   - name: ans-homelab-production
-    url: 'https://github.com/kylar514/ans-homelab.git'
+    url: 'https://github.com/Kylar514/ans-homelab.git'
     dest: '/home/{{ ansible_user }}/ans-homelab'
     branch: master
     command: 'ansible-playbook playbooks/site.yml --vault-password-file ~/.ansible_vault_pass'
 
-  - name: docker-services-production
-    url: 'https://github.com/kylar514/docker-services.git'
-    dest: '/home/{{ ansible_user }}/docker-services'
-    branch: master
-    command: 'ansible-playbook playbooks/deploy-services.yml --vault-password-file ~/.ansible_vault_pass'
-
-  - name: docker-services-staging
-    url: 'https://github.com/kylar514/docker-services.git'
-    dest: '/home/{{ ansible_user }}/docker-services-staging'
-    branch: test
-    command: 'ansible-playbook playbooks/deploy-services.yml -i inventories/staging --vault-password-file ~/.ansible_vault_pass'
-
-  - name: server-config
-    url: 'https://github.com/kylar514/server-config.git'
-    dest: '/home/{{ ansible_user }}/server-config'
-    branch: master
-    command: 'ansible-playbook playbooks/deploy-server-config.yml -i inventories/produciton/inventory.yml -i inventories/staging/inventory.yml'

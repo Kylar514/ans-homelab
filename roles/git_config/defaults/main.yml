@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: MIT-0
+---
+# defaults file for git_config
+
+git_config_credentials_file: '/home/{{ ansible_user }}/.git-credentials'
+git_config_runner_pat_file: '/home/{{ ansible_user }}/.github_runner_pat'
+git_config_github_host: 'github.com'
+git_config_github_user: 'Kylar514'

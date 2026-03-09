@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: MIT-0
+---
+# handlers file for actions_runner
+
+- name: Restart actions_runner
+  ansible.builtin.systemd:
+    name: actions-runner.service
+    state: restarted
+    scope: user
+  become_user: '{{ ansible_user }}'

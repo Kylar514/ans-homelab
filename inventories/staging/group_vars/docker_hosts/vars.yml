@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: MIT-0
+---
+# vars for docker_hosts group in staging env
+
+# Repos cloned on staging docker hosts.
+repos:
+  - name: server-config
+    url: 'https://github.com/Kylar514/server-config.git'
+    dest: '/home/{{ ansible_user }}/server-config'
+    branch: master
+  - name: docker-services
+    url: 'https://github.com/Kylar514/docker-services.git'
+    dest: '/home/{{ ansible_user }}/docker-services'
+    branch: test

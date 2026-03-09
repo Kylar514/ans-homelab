@@ -1,0 +1,43 @@
+# SPDX-License-Identifier: MIT-0
+---
+# tasks file for actions_runner configuration (included)
+
+- name: "Check if runner configured for {{ runner_repo.name }}"
+  ansible.builtin.stat:
+    path: "{{ actions_runner_base_dir }}-{{ runner_repo.name }}/.runner"
+  register: "runner_configured"
+
+- name: "Force remove runner config for {{ runner_repo.name }}"
+  ansible.builtin.file:
+    path: "{{ actions_runner_base_dir }}-{{ runner_repo.name }}/.runner"
+    state: absent
+  when: actions_runner_force_reregister | bool
+
+- name: "Get runner registration token for {{ runner_repo.name }} from GitHub API"
+  ansible.builtin.uri:
+    url: "https://api.github.com/repos/Kylar514/{{ runner_repo.name }}/actions/runners/registration-token"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ vault_github_runner_pat }}"
+      Accept: "application/vnd.github+json"
+      X-GitHub-Api-Version: "2022-11-28"
+    status_code: 201
+  register: runner_reg_token
+  no_log: true
+  when: not runner_configured.stat.exists or actions_runner_force_reregister | bool
+
+- name: "Configure runner for {{ runner_repo.name }}"
+  ansible.builtin.command:
+    cmd: >-
+      {{ actions_runner_base_dir }}-{{ runner_repo.name }}/config.sh
+      --unattended
+      --url {{ runner_repo.url }}
+      --token {{ runner_reg_token.json.token }}
+      --name {{ inventory_hostname }}-{{ runner_repo.name }}
+      --labels {{ actions_runner_labels }}
+      --runnergroup {{ actions_runner_group }}
+      --replace
+    chdir: "{{ actions_runner_base_dir }}-{{ runner_repo.name }}"
+  become_user: '{{ ansible_user }}'
+  no_log: true
+  when: not runner_configured.stat.exists or actions_runner_force_reregister | bool

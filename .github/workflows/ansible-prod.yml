@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: MIT-0
+---
+name: Prod CI/CD
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run site.yml
+        run: |
+          ansible-playbook playbooks/site.yml \
+            --vault-password-file ~/.ansible_vault_pass
