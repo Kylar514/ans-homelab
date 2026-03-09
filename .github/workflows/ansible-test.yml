@@ -23,3 +23,9 @@ jobs:
           ansible-playbook playbooks/site.yml \
             --check --diff \
             --vault-password-file ~/.ansible_vault_pass
+      - name: Dry run against staging
+        run: |
+          source ~/.keychain/Azir-sh
+          ansible-playbook playbooks/site.yml -i inventories/staging \
+            --check --diff \
+            --vault-password-file ~/.ansible_vault_pass
