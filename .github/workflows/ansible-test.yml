@@ -15,11 +15,11 @@ jobs:
       - uses: actions/checkout@v4
       - name: Source SSH agent environment
         run: |
-          source ~/.keychain/azir-sh
+          source ~/.keychain/Azir-sh
           ansible-playbook playbooks/site.yml --syntax-check
       - name: Dry run against prod
         run: |
-          source ~/.keychain/azir-sh
+          source ~/.keychain/Azir-sh
           ansible-playbook playbooks/site.yml \
             --check --diff \
             --vault-password-file ~/.ansible_vault_pass
