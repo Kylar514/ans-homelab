@@ -4,7 +4,7 @@
 # Requires vip_auth_pass to be available via Ansible Vault.
 # Run with: ansible-playbook playbooks/vip_failover.yml --ask-vault-pass
 - name: VIP failover setup
-  hosts: traefik_hosts
+  hosts: vip_failover
   become: true
   roles:
     - vip_failover

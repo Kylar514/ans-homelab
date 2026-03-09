@@ -1,12 +1,9 @@
 # Managed by Ansible - do not edit manually
 [Unit]
 Description=GitHub Actions Runner (kylar514/{{ runner_repo.name }}.{{ inventory_hostname }})
-After=network.target ansible-keychain.service
-Wants=ansible-keychain.service
 
 [Service]
 Type=simple
-EnvironmentFile=/home/{{ ansible_user }}/.keychain/{{ inventory_hostname }}-sh
 ExecStart={{ actions_runner_base_dir }}-{{ runner_repo.name }}/run.sh
 WorkingDirectory={{ actions_runner_base_dir }}-{{ runner_repo.name }}
 KillMode=process

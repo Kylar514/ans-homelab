@@ -5,6 +5,7 @@
   package:
     name: keepalived
     state: present
+  when: "'vip_failover' in group_names"
 
 - name: Configure keepalived
   template:
@@ -14,9 +15,11 @@
     group: root
     mode: '0644'
   notify: Restart keepalived
+  when: "'vip_failover' in group_names"
 
 - name: Enable and start keepalived
   systemd:
     name: keepalived
     enabled: yes
     state: started
+  when: "'vip_failover' in group_names"

@@ -28,6 +28,11 @@ all:
         zilean:
           traefik_role: backup
 
+    vip_failover:
+      hosts:
+        ryze: {}
+        zilean: {}
+
     pi_hosts:
       hosts:
         ryze: {}
