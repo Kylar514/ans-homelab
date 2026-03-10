@@ -24,17 +24,13 @@ All workflows run on self-hosted GitHub Actions runners on Azir.
 
 | Workflow | Trigger | Action |
 |----------|---------|--------|
-| **Test CI/CD** | Push to `test` branch | SSH into heimerdinger (staging), pull `test` branch, run `site.yml` with staging inventory |
-| **Ansible Test** | Pull request to `master` / push to `test` | Syntax check + dry run (`--check --diff`) against production inventory |
-| **Prod CI/CD** | Push to `master` branch | SSH into prod hosts (azir, ryze, zilean, kennen), pull `master`, run `site.yml` |
-| **Nightly** | Schedule (daily 02:00 UTC) | Run against test → if success, run against prod → if fail, trigger notification (placeholder) |
+| **Ansible Test** | Pull request to `master` / push to `test` | Syntax check + dry run (`--check --diff`) against production and staging inventories |
+| **Prod CI/CD** | Push to `master` branch | SSH into prod and staging hosts, pull `master`, run `site.yml` against both |
 
 ### Workflow Behavior
 
-- **Test CI/CD**: Targets only staging host (heimerdinger), uses `inventories/staging/inventory.yml`
-- **Prod CI/CD**: Targets all production hosts, uses `inventories/production/inventory.yml`
-- **Ansible Test**: Runs `ansible-playbook --syntax-check` + `ansible-playbook --check --diff` against production inventory. Does NOT execute any changes, only validates syntax and shows pending changes
-- **Nightly**: First runs staging playbook, waits for result. On success, runs production playbook. On failure, exits without running prod (notification hook commented out, ready to enable)
+- **Ansible Test**: Runs `ansible-playbook --syntax-check` + `ansible-playbook --check --diff` against both production and staging inventories. Does NOT execute any changes
+- **Prod CI/CD**: Targets all production hosts AND staging host, uses `inventories/production/inventory.yml` and `inventories/staging/inventory.yml`
 
 ---
 
@@ -51,7 +47,7 @@ ansible-playbook playbooks/site.yml -i inventories/staging \
   --vault-password-file ~/.ansible_vault_pass
 
 # Bootstrap Azir as control node (run once from desktop after Terraform)
-ansible-playbook playbooks/ansible_setup.yml --private-key ~/.ssh/homelab \
+ansible-playbook playbooks/bootstrap.yml --private-key ~/.ssh/homelab \
   --vault-password-file ~/.ansible_vault_pass
 
 # Individual playbooks
@@ -93,7 +89,7 @@ ansible-vault view inventories/production/group_vars/ansible_control/vault.yml
 ans-homelab/
   .github/
     workflows/                 # GitHub Actions workflows (future)
-  ansible.cfg                 # private_key_file, inventory, vault_password_file
+  ansible.cfg                 # private_key_file, inventory, vault_password_file, remote_user
   AGENTS.md                   # This file
   playbooks/
     site.yml                  # Master converge — imports all playbooks in order

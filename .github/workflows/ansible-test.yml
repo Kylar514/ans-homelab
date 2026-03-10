@@ -5,8 +5,14 @@ name: Ansible Test
 on:
   push:
     branches: [test]
+    paths-ignore:
+      - 'README.md'
+      - 'AGENTS.md'
   pull_request:
     branches: [master]
+    paths-ignore:
+      - 'README.md'
+      - 'AGENTS.md'
 
 jobs:
   test:
