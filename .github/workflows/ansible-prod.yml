@@ -5,6 +5,9 @@ name: Prod CI/CD
 on:
   push:
     branches: [master]
+    paths-ignore:
+      - 'README.md'
+      - 'AGENTS.md'
 
 jobs:
   deploy:
