@@ -10,6 +10,7 @@
     - timezone
     - ssh_access
     - sys_packages
+    - docker
     - unattended_upgrades
     - git_config
     - clone_repos
