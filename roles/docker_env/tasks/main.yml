@@ -1,0 +1,31 @@
+# SPDX-License-Identifier: MIT-0
+---
+# tasks file for docker_env
+# Writes .env files from vault variables to /srv/docker/env/<path>.env on target hosts.
+# Run manually via deploy-env.yml when secrets change. Never runs in compose CI.
+# Templates live in roles/docker_env/templates/ — one .env.j2 per service.
+
+- name: Ensure .env parent directory exists
+  file:
+    path: '{{ docker_env_base_dir }}/{{ item.path | dirname }}'
+    state: directory
+    owner: zeal
+    group: zeal
+    mode: '0700'
+  loop: '{{ docker_env_services }}'
+  loop_control:
+    label: '{{ item.path }}'
+  when: docker_env_services | length > 0
+
+- name: Write service .env file from vault
+  template:
+    src: '{{ item.template }}'
+    dest: '{{ docker_env_base_dir }}/{{ item.path }}.env'
+    owner: zeal
+    group: zeal
+    mode: '0600'
+  loop: '{{ docker_env_services }}'
+  loop_control:
+    label: '{{ item.path }}'
+  when: docker_env_services | length > 0
+  no_log: true

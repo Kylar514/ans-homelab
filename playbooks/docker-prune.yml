@@ -1,0 +1,21 @@
+# SPDX-License-Identifier: MIT-0
+---
+# Prune unused Docker resources on docker_hosts.
+# All flags default to false — each must be explicitly passed via --extra-vars.
+# Never pass docker_prune_volumes=true in CI or without confirming all services are running.
+#
+# Usage:
+#   ansible-playbook playbooks/docker-prune.yml \
+#     --extra-vars 'docker_prune_images=true docker_prune_networks=true' \
+#     --limit kennen
+#
+#   # MANUAL ONLY — confirm all services running first
+#   ansible-playbook playbooks/docker-prune.yml \
+#     --extra-vars 'docker_prune_volumes=true' \
+#     --limit kennen
+
+- name: Prune unused Docker resources
+  hosts: docker_hosts
+  become: true
+  roles:
+    - docker_prune

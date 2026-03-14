@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT-0
-#---
+---
 # defaults file for docker
 
 # Docker data directory — used by the users role to create dockersvc home.

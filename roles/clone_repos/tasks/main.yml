@@ -16,3 +16,29 @@
   loop_control:
     label: '{{ item.name }}'
   when: repos | length > 0
+
+- name: Set repository directory permissions
+  command: >
+    find {{ item.dest }} -type d
+    -exec chown {{ item.permissions.owner }}:{{ item.permissions.group }} {} +
+    -exec chmod {{ item.permissions.dir_mode }} {} +
+  loop: '{{ repos }}'
+  loop_control:
+    label: '{{ item.name }}'
+  when:
+    - repos | length > 0
+    - item.permissions is defined
+  changed_when: false
+
+- name: Set repository file permissions
+  command: >
+    find {{ item.dest }} -type f
+    -exec chown {{ item.permissions.owner }}:{{ item.permissions.group }} {} +
+    -exec chmod {{ item.permissions.file_mode }} {} +
+  loop: '{{ repos }}'
+  loop_control:
+    label: '{{ item.name }}'
+  when:
+    - repos | length > 0
+    - item.permissions is defined
+  changed_when: false

@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: MIT-0
+---
+# defaults file for docker_compose
+
+# Action to pass to docker compose — override via --extra-vars
+docker_compose_action: "up -d --remove-orphans"
+
+# List of service paths relative to docker_compose_base_dir to act on.
+# Example: ['core/traefik', 'services/kennen/vaultwarden']
+# Set via --extra-vars in CI or manually.
+docker_compose_services: []
+
+# Base directory where the docker-services repo is cloned on target hosts.
+docker_compose_base_dir: /srv/docker/docker-services

@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: MIT-0
+---
+# tasks file for docker_compose
+# Runs docker compose commands on specified service directories.
+# Services are passed via docker_compose_services (list of paths relative to
+# docker_compose_base_dir). Ansible user (zeal) runs compose directly —
+# containers run as dockersvc (2000:2000) via user: field in each compose file.
+
+- name: Run docker compose {{ docker_compose_action }}
+  command: docker compose {{ docker_compose_action }}
+  args:
+    chdir: '{{ docker_compose_base_dir }}/{{ item }}'
+  loop: '{{ docker_compose_services }}'
+  loop_control:
+    label: '{{ item }}'
+  when: docker_compose_services | length > 0
+  changed_when: false
