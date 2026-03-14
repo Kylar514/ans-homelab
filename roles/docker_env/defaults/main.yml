@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: MIT-0
+---
+# defaults file for docker_env
+
+# List of services to write .env files for.
+# Each entry requires:
+#   path:     service path matching docker-services repo structure
+#             e.g. 'core/traefik' or 'services/kennen/vaultwarden'
+#   template: template filename from roles/docker_env/templates/
+#             e.g. 'traefik.env.j2'
+# Example:
+#   docker_env_services:
+#     - path: core/traefik
+#       template: traefik.env.j2
+#     - path: services/kennen/vaultwarden
+#       template: vaultwarden.env.j2
+docker_env_services: []
+
+# Base directory where .env files are written on target hosts.
+# Files are written to {{ docker_env_base_dir }}/{{ item.path }}.env
+# and referenced via env_file: in each service's compose.yml.
+docker_env_base_dir: /srv/docker/env

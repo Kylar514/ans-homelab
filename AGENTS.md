@@ -79,6 +79,19 @@ ansible-playbook playbooks/site.yml --limit ryze \
 ansible-vault encrypt inventories/production/group_vars/ansible_control/vault.yml
 ansible-vault edit inventories/production/group_vars/ansible_control/vault.yml
 ansible-vault view inventories/production/group_vars/ansible_control/vault.yml
+
+# Deploy compose services (called by docker-services CI, or manually)
+ansible-playbook playbooks/deploy-compose.yml \
+  --extra-vars 'docker_compose_services=["core/traefik"]' \
+  --limit traefik_hosts
+
+# Write .env secret files from vault (manual — run when rotating secrets)
+ansible-playbook playbooks/deploy-env.yml --limit kennen
+
+# Prune unused Docker resources (manual only — never volumes in CI)
+ansible-playbook playbooks/docker-prune.yml \
+  --extra-vars 'docker_prune_images=true docker_prune_networks=true' \
+  --limit kennen
 ```
 
 ---
@@ -88,34 +101,78 @@ ansible-vault view inventories/production/group_vars/ansible_control/vault.yml
 ```
 ans-homelab/
   .github/
-    workflows/                 # GitHub Actions workflows (future)
+    workflows/                 # GitHub Actions workflows
   ansible.cfg                 # private_key_file, inventory, vault_password_file, remote_user
   AGENTS.md                   # This file
+  dockerplan.md               # Docker Compose deployment design spec
   playbooks/
     site.yml                  # Master converge — imports all playbooks in order
     base.yml                  # SSH keys, packages, upgrades — targets all hosts
-    ansible_setup.yml         # Azir control node setup
+    bootstrap.yml             # Azir control node setup — run once after Terraform
     ufw.yml                   # Firewall rules — SSH always unconditionally allowed
-    docker.yml                # Docker CE + dockersvc user/group — docker_hosts only
+    docker.yml                # Docker CE + dockersvc user/group + /srv/docker dirs
     vip_failover.yml          # Keepalived VIP failover — traefik_hosts only
     maintain.yml              # Self-maintenance (keychain reload, etc.)
+    deploy-compose.yml        # Deploy docker compose services — called by docker-services CI
+    deploy-env.yml            # Write .env files from vault — manual, secret rotation only
+    docker-prune.yml          # Prune unused Docker resources — manual only
   roles/
     ssh_access/               # authorized_keys managed via Jinja2 template
     sys_packages/             # Base packages + ansible_control conditional packages
     unattended_upgrades/      # Automatic security updates
     ufw/                      # UFW firewall — SSH rule is unconditional task
-    docker/                   # Docker CE install, dockersvc group/user
+    docker/                   # Docker CE install, dockersvc group/user, /srv/docker dirs
     vip_failover/             # Keepalived config template + restart handler
-    clone_repos/              # Generic git clone/update role
+    clone_repos/              # Generic git clone/update role with optional permissions fixup
     secrets/                  # Write vault secrets to disk (any host)
     keychain/                 # Configure keychain + SSH key loading on login
     timezone/                 # Set system timezone
-    actions_runner/           # [IN PROGRESS] Self-hosted GitHub Actions runner
+    actions_runner/           # Self-hosted GitHub Actions runner (Azir only)
+    docker_compose/           # Run docker compose commands on docker_hosts
+    docker_env/               # Write .env files from vault to /srv/docker/env/
+    docker_prune/             # Prune unused Docker resources
   inventories/
     production/               # azir, ryze, zilean, kennen
     staging/                  # heimerdinger
     dmz/                      # Future use
 ```
+
+---
+
+## /srv/docker Layout (docker_hosts)
+
+Ansible creates the top-level structure. Service data dirs are created by Docker on first run
+(containers run as `user: 2000:2000` in compose, so bind-mount dirs are owned by `dockersvc`).
+
+```
+/srv/docker/                          zeal:zeal        0755  top level
+  docker-services/                    zeal:dockersvc   2770  git repo (clone_repos)
+    core/                                                     → traefik_hosts services
+    services/                                                 → per-host services
+  data/                               dockersvc:dockersvc 0770  container bind-mount state
+    <service>/                                               created by Docker on first run
+  env/                                zeal:zeal        0700  Ansible-written .env secrets
+    core/traefik.env                  zeal:zeal        0600  per-service env files
+    services/kennen/vaultwarden.env
+  globaldata/                         dockersvc:dockersvc 0770  NFS mountpoint (future)
+```
+
+### Ownership rationale
+- `docker-services/` is `zeal:dockersvc 2770` — zeal owns (git works normally), dockersvc group
+  can read/write (service-writable config files), setgid propagates group on new files/dirs.
+  Security note: dockersvc can modify compose files, but compose only runs after Ansible git pull
+  which overwrites them — exploitability window is effectively zero.
+- `data/` is `dockersvc:dockersvc` — containers write here. Zeal (in dockersvc group) can inspect.
+- `env/` is `zeal:zeal 0700` — only zeal reads/writes. Docker passes vars into containers at
+  runtime via `env_file:` in compose; dockersvc never directly reads these files.
+- `globaldata/` placeholder for future NFS mount from Nasus.
+
+### compose file conventions
+- All services use `user: "2000:2000"` (dockersvc uid:gid) — containers never run as root
+- Config-as-code (read-only) mounted `:ro` from inside the repo clone
+- Runtime state mounted from `/srv/docker/data/<service>/`
+- Secrets loaded via `env_file: /srv/docker/env/<path>.env`
+- Shared/media data will mount from `/srv/docker/globaldata/` (once NFS is live)
 
 ---
 
@@ -183,6 +240,7 @@ ans-homelab/
 - `vault_password_file = ~/.ansible_vault_pass` set in `ansible.cfg` on Azir
 - Vault pass file written to Azir by `secrets` role during bootstrap
 - GitHub Actions workflows access vault password via repository secrets
+- Service `.env` files written to `/srv/docker/env/` by `deploy-env.yml` — never committed
 
 ---
 
@@ -199,45 +257,21 @@ ans-homelab/
 
 ---
 
-## In Progress
-
-### `actions_runner` Role
-- Installs and configures self-hosted GitHub Actions runner on target hosts
-- Variables:
-  - `actions_runner_version`: Runner version to install
-  - `actions_runner_group`: Runner group name
-  - `actions_runner_repo_url`: Repository URL to register with
-- Tasks:
-  - Download and extract runner archive
-  - Create dedicated user (optional)
-  - Configure runner with auth token
-  - Install as systemd service
-- Handler: `Restart actions_runner` to restart the service
-
----
-
 ## Roadmap & Future Work
 
-### Docker Services Repo (`kylar514/docker-services`)
+### Next — `docker-services` Repo (`kylar514/docker-services`)
 - Separate GitHub repo for all Docker Compose files and service configs
+- Cloned to `/srv/docker/docker-services/` on all `docker_hosts` by `clone_repos`
 - Structure:
   - `core/` — traefik, adguard, adguardhome-sync (deploys to `traefik_hosts`)
   - `services/kennen/` — vaultwarden, arr-stack, torrent, omnitools, IT tools
-  - `media/nasus/` — jellyfin (GPU passthrough, stays on NAS)
-- Compose files deploy to `/opt/<service-name>/` on target hosts
-- Workflows will trigger service deployments on this repo
+- CI workflow maps path prefix → `--limit` target, calls `deploy-compose.yml`
+- See `dockerplan.md` for full design spec
 
 ### Planned — Ansible Roles
-- `deploy_services` — copy compose files to `/opt/<service>/`, run `docker compose up -d --remove-orphans`
-- `nfs_server` — configure NFS exports on Nasus for VM storage access
-- `jellyfin` — manage Jellyfin container on Nasus (media_hosts group)
-
-### Planned — Playbooks
-- `deploy-core.yml` — rolling HA update for traefik_hosts with keepalived VIP handoff
-  (`serial: 1`, pre-task lowers keepalived priority to release VIP, post-task reboots
-  and restores priority — zero downtime updates)
-- `deploy-services.yml` — non-HA service deployment to kennen
+- `nfs_server` — configure NFS exports on Nasus for shared storage
+- `nfs_client` — mount Nasus NFS share at `/srv/docker/globaldata/` on docker_hosts
 
 ### Planned — Infrastructure
-- `nasus` added to inventory as `media_hosts` group
+- `nasus` added to inventory as `media_hosts` + `nfs_server` group (after Nasus migration complete)
 - DMZ inventory populated — webhook receiver once DMZ network is configured

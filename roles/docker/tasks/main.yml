@@ -58,6 +58,7 @@
     state: present
     system: yes
   when: "'docker_hosts' in group_names"
+
 - name: Ensure dockersvc user exists
   user:
     name: dockersvc
@@ -72,7 +73,45 @@
 - name: Ensure zeal is in docker group
   user:
     name: zeal
-    groups: docker
+    groups:
+      - docker
+      - dockersvc
     append: yes
     state: present
+  when: "'docker_hosts' in group_names"
+
+- name: Ensure /srv/docker top-level directory exists
+  file:
+    path: '{{ docker_data_dir }}'
+    state: directory
+    owner: zeal
+    group: zeal
+    mode: '0755'
+  when: "'docker_hosts' in group_names"
+
+- name: Ensure /srv/docker/data directory exists
+  file:
+    path: '{{ docker_data_dir }}/data'
+    state: directory
+    owner: dockersvc
+    group: dockersvc
+    mode: '0770'
+  when: "'docker_hosts' in group_names"
+
+- name: Ensure /srv/docker/env directory exists
+  file:
+    path: '{{ docker_data_dir }}/env'
+    state: directory
+    owner: zeal
+    group: zeal
+    mode: '0700'
+  when: "'docker_hosts' in group_names"
+
+- name: Ensure /srv/docker/globaldata directory exists
+  file:
+    path: '{{ docker_data_dir }}/globaldata'
+    state: directory
+    owner: dockersvc
+    group: dockersvc
+    mode: '0770'
   when: "'docker_hosts' in group_names"

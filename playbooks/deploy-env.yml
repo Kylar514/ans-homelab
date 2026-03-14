@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: MIT-0
+---
+# Write service .env files from vault to /srv/docker/env/ on docker_hosts.
+# Run manually when secrets change. Does NOT deploy or restart services.
+# After running this, services pick up new secrets on next restart or redeploy.
+#
+# Requires docker_env_services to be defined in group_vars or via --extra-vars.
+# Templates live in roles/docker_env/templates/ — one .env.j2 per service.
+#
+# Usage:
+#   ansible-playbook playbooks/deploy-env.yml --limit kennen
+#   ansible-playbook playbooks/deploy-env.yml --limit traefik_hosts
+#   ansible-playbook playbooks/deploy-env.yml  # all docker_hosts
+
+- name: Write service environment files from vault
+  hosts: docker_hosts
+  become: true
+  roles:
+    - docker_env

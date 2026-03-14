@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: MIT-0
+---
+# defaults file for docker_prune
+# All flags default to false — each must be explicitly opted into via --extra-vars.
+# Never enable docker_prune_volumes in CI — only run manually with services confirmed running.
+
+docker_prune_images: false
+docker_prune_containers: false
+docker_prune_networks: false
+docker_prune_volumes: false
