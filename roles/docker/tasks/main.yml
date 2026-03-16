@@ -115,3 +115,9 @@
     group: dockersvc
     mode: '0770'
   when: "'docker_hosts' in group_names"
+
+- name: Ensure mybridge Docker network exists
+  community.docker.docker_network:
+    name: mybridge
+    state: present
+  when: "'docker_hosts' in group_names"
