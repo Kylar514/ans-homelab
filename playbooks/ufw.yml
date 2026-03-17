@@ -4,7 +4,7 @@
 # Baseline: deny incoming, allow outgoing, SSH always open.
 # Per-service rules are added via ufw_rules in group_vars or host_vars.
 - name: UFW firewall setup
-  hosts: all
+  hosts: all,!nfs_server
   become: true
   roles:
     - ufw

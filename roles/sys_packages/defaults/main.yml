@@ -9,6 +9,7 @@ base_packages:
   - unattended-upgrades
   - ca-certificates
   - gnupg
+  - nfs-common
 
 ansible_control_node:
   - ansible

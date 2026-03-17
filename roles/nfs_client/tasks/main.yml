@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: MIT-0
+---
+# tasks file for nfs_client
+# Mounts NFS shares from nasus onto docker_hosts.
+# Mount points are created by the docker role — this role just mounts them.
+# nfs-common is installed via sys_packages base_packages fleet-wide.
+
+- name: Mount NFS shares
+  ansible.builtin.mount:
+    src: '{{ item.src }}'
+    path: '{{ item.path }}'
+    fstype: nfs
+    opts: '{{ item.opts }}'
+    state: mounted
+  loop: '{{ nfs_mounts }}'
+  loop_control:
+    label: '{{ item.path }}'
+  when: "'nfs_clients' in group_names"

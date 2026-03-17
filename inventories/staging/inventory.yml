@@ -22,6 +22,10 @@ all:
       hosts:
         heimerdinger: {}
 
+    nfs_clients:
+      hosts:
+        heimerdinger: {}
+
     production:
       children:
         docker_hosts: {}

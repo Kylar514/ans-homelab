@@ -116,6 +116,24 @@
     mode: '0770'
   when: "'docker_hosts' in group_names"
 
+- name: Ensure /srv/docker/slowdata directory exists
+  file:
+    path: '{{ docker_data_dir }}/slowdata'
+    state: directory
+    owner: dockersvc
+    group: dockersvc
+    mode: '0770'
+  when: "'docker_hosts' in group_names"
+
+- name: Ensure /srv/docker/fastdata directory exists
+  file:
+    path: '{{ docker_data_dir }}/fastdata'
+    state: directory
+    owner: dockersvc
+    group: dockersvc
+    mode: '0770'
+  when: "'docker_hosts' in group_names"
+
 - name: Ensure mybridge Docker network exists
   community.docker.docker_network:
     name: mybridge

@@ -13,6 +13,9 @@ all:
     kennen:
       ansible_host: 10.0.40.9
       ansible_user: zeal
+    nasus:
+      ansible_host: 10.0.40.3
+      ansible_user: zeal
 
   children:
     docker_hosts:
@@ -39,6 +42,16 @@ all:
 
     vm_hosts:
       hosts:
+        zilean: {}
+        kennen: {}
+
+    nfs_server:
+      hosts:
+        nasus: {}
+
+    nfs_clients:
+      hosts:
+        ryze: {}
         zilean: {}
         kennen: {}
 

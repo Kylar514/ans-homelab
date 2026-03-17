@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: MIT-0
+---
+# Mount NFS shares from nasus onto nfs_clients.
+# Runs after base.yml so nfs-common is already installed and
+# /srv/docker/slowdata + /srv/docker/fastdata dirs already exist.
+#
+# Usage:
+#   ansible-playbook playbooks/nfs.yml
+#   ansible-playbook playbooks/nfs.yml --limit kennen
+
+- name: Mount NFS shares on NFS clients
+  hosts: nfs_clients
+  become: true
+  roles:
+    - nfs_client

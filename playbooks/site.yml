@@ -8,6 +8,8 @@
 #   Staging/tst: ansible-playbook playbooks/site.yml -i inventories/staging --ask-vault-pass
 
 - import_playbook: base.yml
+- import_playbook: docker.yml
 - import_playbook: ufw.yml
+- import_playbook: nfs.yml
 - import_playbook: vip_failover.yml
 - import_playbook: maintain.yml
