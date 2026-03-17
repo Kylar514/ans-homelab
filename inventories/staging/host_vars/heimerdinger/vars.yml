@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: MIT-0
+---
+# host_vars for heimerdinger — staging host
+# Mirrors production service secrets for testing.
+# Keep in sync with production host_vars as services are onboarded.
+
+docker_env_services:
+  - path: traefik
+    template: traefik.env.j2
