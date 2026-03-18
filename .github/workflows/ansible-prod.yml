@@ -20,6 +20,7 @@ jobs:
           files: |
             playbooks/**
             roles/**
+            !roles/docker_env/templates/**
             inventories/**/inventory.yml
 
       - name: Run site.yml against prod

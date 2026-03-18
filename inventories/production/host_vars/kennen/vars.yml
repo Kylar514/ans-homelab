@@ -4,4 +4,12 @@
 # Add a new entry here when onboarding a service that needs secrets.
 # Template must exist in roles/docker_env/templates/<template>.
 
-docker_env_services: []
+docker_env_services:
+  - path: vaultwarden
+    template: vaultwarden.env.j2
+  - path: nextcloud
+    template: nextcloud.env.j2
+  - path: torrent
+    template: torrent.env.j2
+  - path: homarrr
+    template: homarrr.env.j2

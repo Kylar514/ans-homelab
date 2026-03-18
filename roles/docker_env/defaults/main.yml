@@ -3,20 +3,27 @@
 # defaults file for docker_env
 
 # List of services to write .env files for.
+# Defined per host in host_vars/<hostname>/vars.yml — each host only gets
+# the secrets for the services it runs.
+#
 # Each entry requires:
-#   path:     service path matching docker-services repo structure
-#             e.g. 'core/traefik' or 'services/kennen/vaultwarden'
+#   path:     flat service name — file is written to /srv/docker/env/<path>.env
+#             e.g. 'vaultwarden' -> /srv/docker/env/vaultwarden.env
+#                  'traefik'     -> /srv/docker/env/traefik.env
 #   template: template filename from roles/docker_env/templates/
-#             e.g. 'traefik.env.j2'
-# Example:
+#             e.g. 'vaultwarden.env.j2'
+#
+# Example (in host_vars/kennen/vars.yml):
 #   docker_env_services:
-#     - path: core/traefik
-#       template: traefik.env.j2
-#     - path: services/kennen/vaultwarden
+#     - path: vaultwarden
 #       template: vaultwarden.env.j2
+#
+# Example (in host_vars/ryze/vars.yml):
+#   docker_env_services:
+#     - path: traefik
+#       template: traefik.env.j2
 docker_env_services: []
 
 # Base directory where .env files are written on target hosts.
-# Files are written to {{ docker_env_base_dir }}/{{ item.path }}.env
-# and referenced via env_file: in each service's compose.yml.
+# Created by the docker role — do not create it here.
 docker_env_base_dir: /srv/docker/env
