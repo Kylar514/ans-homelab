@@ -10,7 +10,7 @@
     dest: '{{ item.dest }}'
     version: "{{ item.branch | default('master') }}"
     update: true
-    force: false
+    force: true
   become_user: '{{ ansible_user }}'
   loop: '{{ repos }}'
   loop_control:
