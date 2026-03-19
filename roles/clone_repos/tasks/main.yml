@@ -17,6 +17,18 @@
     label: '{{ item.name }}'
   when: repos | length > 0
 
+- name: Disable git fileMode tracking in repository
+  community.general.git_config:
+    repo: '{{ item.dest }}'
+    name: core.fileMode
+    value: 'false'
+    scope: local
+  become_user: '{{ ansible_user }}'
+  loop: '{{ repos }}'
+  loop_control:
+    label: '{{ item.name }}'
+  when: repos | length > 0
+
 - name: Set repository directory permissions
   command: >
     find {{ item.dest }} -type d
