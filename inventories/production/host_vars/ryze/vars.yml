@@ -1,8 +1,0 @@
-# SPDX-License-Identifier: MIT-0
----
-# host_vars for ryze — traefik_hosts primary
-# Services running on ryze: traefik, adguard
-
-docker_env_services:
-  - path: traefik
-    template: traefik.env.j2

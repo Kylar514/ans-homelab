@@ -1,8 +1,0 @@
-# SPDX-License-Identifier: MIT-0
----
-# host_vars for zilean — traefik_hosts backup
-# Services running on zilean: traefik, adguard
-
-docker_env_services:
-  - path: traefik
-    template: traefik.env.j2

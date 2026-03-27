@@ -1,4 +1,8 @@
 # Managed by Ansible - do not edit manually
 {% for key in pubkeys %}
+{% if key == 'ansible.pub' %}
+from="{{ ansible_control_ip }}" {{ lookup('file', role_path + '/files/' + key) }}
+{% else %}
 {{ lookup('file', role_path + '/files/' + key) }}
+{% endif %}
 {% endfor %}
