@@ -1,0 +1,17 @@
+SPDX-License-Identifier: MIT-0
+---
+# UFW rules for this host/group.
+# Each entry supports:
+#   port:   The port number to allow/deny
+#   proto:  Protocol ('tcp' or 'udp'), defaults to 'tcp'
+#   rule:   'allow' or 'deny', defaults to 'allow'
+
+groups_ufw_rules:
+  # Allow API Server
+  - port: 6443
+    proto: tcp
+    rule: allow
+  # Allow HTTPS
+  - port: 443
+    proto: tcp
+    rule: allow
