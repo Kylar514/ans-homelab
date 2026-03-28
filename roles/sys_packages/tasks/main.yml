@@ -7,12 +7,4 @@
     name: '{{ item }}'
     state: present
     update_cache: yes
-  loop: '{{ base_packages }}'
-
-- name: Packages for ansible control node
-  package:
-    name: '{{ item }}'
-    state: present
-    update_cache: yes
-  loop: '{{ ansible_control_node }}'
-  when: "'ansible_control' in group_names"
+  loop: '{{ (packages_all + packages_group | default([])) | unique }}'
