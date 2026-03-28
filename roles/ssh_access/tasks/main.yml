@@ -1,6 +1,7 @@
 #SPDX-License-Identifier: MIT-0
 ---
 # tasks file for ssh_access
+
 - name: Compile and set authorized_keys for users
   template:
     src: authorized_keys.j2
@@ -9,5 +10,9 @@
     group: '{{ item.name }}'
     mode: '0600'
   vars:
-    pubkeys: '{{ item.pubkeys }}'
+    pubkeys: >-
+      {{ item.pubkeys
+         | map('regex_replace', '^(.*)$', ssh_pubkey_path + '/\\1')
+         | map('lookup', 'file')
+         | list }}
   loop: '{{ ssh_users }}'
