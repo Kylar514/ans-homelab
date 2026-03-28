@@ -2,7 +2,7 @@
 ---
 # All Packages
 
-packages:
+all_packages:
   - ufw
   - curl
   - vim
