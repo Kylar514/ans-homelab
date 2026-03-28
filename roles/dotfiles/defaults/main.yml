@@ -1,5 +1,0 @@
-# SPDX-License-Identifier: MIT-0
----
-# tasks file for server_config
-
-dotfiles_src_dir: '{{ inventory_dir }}/files/dotfiles'
