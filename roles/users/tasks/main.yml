@@ -1,0 +1,52 @@
+# SPDX-License-Identifier: MIT-0
+---
+# Create User and Groups
+
+- name: Merge all_users and group_users
+  set_fact:
+    final_users: >-
+      {{ ((all_users | default([])) + (group_users | default([])))
+         | unique(attribute='name') }}
+
+- name: Ensure groups exist
+  ansible.builtin.group:
+    name: '{{ item.group }}'
+    state: present
+  loop: '{{ final_users }}'
+  loop_control:
+    loop_var: item
+
+- name: Ensure users exist
+  ansible.builtin.user:
+    name: '{{ item.name }}'
+    uid: '{{ item.uid | default(omit) }}'
+    group: '{{ item.group }}'
+    shell: "{{ item.shell | default('/bin/bash') }}"
+    state: present
+    create_home: yes
+  loop: '{{ final_users }}'
+  loop_control:
+    loop_var: item
+
+- name: Ensure SSH directory exists for user
+  ansible.builtin.file:
+    path: '/home/{{ item.name }}/.ssh'
+    state: directory
+    owner: '{{ item.name }}'
+    group: '{{ item.group }}'
+    mode: '0700'
+  loop: '{{ final_users }}'
+  loop_control:
+    loop_var: item
+
+- name: Enable passwordless sudo if requested
+  ansible.builtin.copy:
+    dest: '/etc/sudoers.d/{{ item.name }}'
+    content: '{{ item.name }} ALL=(ALL) NOPASSWD:ALL'
+    owner: root
+    group: root
+    mode: '0440'
+  loop: '{{ final_users }}'
+  loop_control:
+    loop_var: item
+  when: item.sudo | default(false)
