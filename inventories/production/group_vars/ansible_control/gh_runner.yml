@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: MIT-0
+---
+# gh runner variables
+
+runner_user: ansible
+runner_work_dir: /opt/gh-runner
+runner_repo_url: 'https://github.com/kylar514/ans-homelab'
+runner_name: '{{ inventory_hostname }}'
+runner_repo_owner: kylar514
+runner_repo_name: ans-homelab
+# gh_pat: in vault expires, so you will need to create a new pat if bootstrap needs to be re-ran
+

@@ -22,7 +22,6 @@ group_ufw_rules:
 
 - Global rules can be set in `inventories/production/all/ufw.yml`
 - Group-specific rules can be set in `inventories/production/groupname/ufw.yml`
-- All
 
 ## Drift Prevention
 
