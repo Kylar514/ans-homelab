@@ -4,10 +4,3 @@
 
 timezone: America/New_York
 ansible_python_interpreter: /usr/bin/python3
-
-# Repos cloned on every host — server-config applies fleet-wide
-repos:
-  - name: server-config
-    url: 'https://github.com/Kylar514/server-config.git'
-    dest: '/home/{{ ansible_user }}/server-config'
-    branch: master
