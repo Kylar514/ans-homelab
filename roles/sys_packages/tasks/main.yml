@@ -8,3 +8,4 @@
     state: present
     update_cache: yes
   loop: '{{ (all_packages + group_packages | default([])) | unique }}'
+  become: true

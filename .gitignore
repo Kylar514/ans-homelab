@@ -1,1 +1,2 @@
 /inventories/production/files/privatekey/ansible
+/inventories/production/group_vars/ansible_control/vault.yml

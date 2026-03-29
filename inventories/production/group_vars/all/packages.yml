@@ -10,3 +10,4 @@ all_packages:
   - ca-certificates
   - gnupg
   - nfs-common
+  - acl

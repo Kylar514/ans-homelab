@@ -4,7 +4,6 @@
 
 - name: Base system setup
   hosts: all
-  become: true
   roles:
     - timezone
     - users

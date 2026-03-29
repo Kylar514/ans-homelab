@@ -12,6 +12,7 @@
   ansible.builtin.group:
     name: '{{ item.group }}'
     state: present
+  become: true
   loop: '{{ final_users }}'
   loop_control:
     loop_var: item
@@ -24,6 +25,7 @@
     shell: "{{ item.shell | default('/bin/bash') }}"
     state: present
     create_home: yes
+  become: true
   loop: '{{ final_users }}'
   loop_control:
     loop_var: item
@@ -35,6 +37,7 @@
     owner: '{{ item.name }}'
     group: '{{ item.group }}'
     mode: '0700'
+  become: true
   loop: '{{ final_users }}'
   loop_control:
     loop_var: item
@@ -46,6 +49,7 @@
     owner: root
     group: root
     mode: '0440'
+  become: true
   loop: '{{ final_users }}'
   loop_control:
     loop_var: item

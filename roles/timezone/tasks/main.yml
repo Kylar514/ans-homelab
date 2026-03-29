@@ -6,3 +6,4 @@
   become: true
   community.general.timezone:
     name: '{{ timezone }}'
+  become: true
