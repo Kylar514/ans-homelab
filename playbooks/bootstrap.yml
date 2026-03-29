@@ -1,7 +1,17 @@
 # SPDX-License-Identifier: MIT-0
 ---
 - name: Bootstrap Azir — SSH key and Actions runner
-  hosts: ansible_control
+  hosts: all
   become: true
   roles:
-    - actions_runner
+    - timezone
+    - users
+    - ssh_access
+    - ansible_key
+    - ansible_repo
+    - sys_packages
+    - gh_runner
+    - copy_files
+    - ufw
+    - nfs_client
+    - unattended_upgrades
