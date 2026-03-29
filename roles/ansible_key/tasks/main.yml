@@ -12,3 +12,4 @@
   loop: '{{ ansible_key }}'
   loop_control:
     loop_var: item
+  when: ansible_key is defined

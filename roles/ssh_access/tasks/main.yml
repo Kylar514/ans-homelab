@@ -9,10 +9,6 @@
     owner: '{{ item.name }}'
     group: '{{ item.name }}'
     mode: '0600'
-  vars:
-    pubkeys: >-
-      {{ item.pubkeys
-         | map('regex_replace', '^(.*)$', ssh_pubkey_path + '/\\1')
-         | map('lookup', 'file')
-         | list }}
   loop: '{{ ssh_users }}'
+  loop_control:
+    loop_var: item

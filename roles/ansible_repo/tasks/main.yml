@@ -18,4 +18,5 @@
     update: yes
     force: yes
   become: true
-  become_user: ansible
+  become_method: sudo
+  when: inventory_hostname in groups['ansible_control']
