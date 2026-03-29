@@ -1,9 +1,0 @@
-# SPDX-License-Identifier: MIT-0
----
-# defaults file for docker
-
-# Docker data directory — used by the users role to create dockersvc home.
-# No custom daemon.json is applied; Docker uses its defaults.
-dockersvc_uid: 2000
-dockersvc_gid: 2000
-docker_data_dir: /srv/docker

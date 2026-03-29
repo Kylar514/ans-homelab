@@ -2,30 +2,13 @@
 ---
 # tasks file for ufw
 
-- name: Set UFW default incoming policy to deny
-  ufw:
-    direction: incoming
-    policy: deny
-
-- name: Set UFW default outgoing policy to allow
-  ufw:
-    direction: outgoing
-    policy: allow
-
-- name: Enable ssh
-  ufw:
-    rule: 'allow'
-    port: '22'
-    proto: tcp
-
-- name: Apply additional UFW rules from ufw_rules variable
-  ufw:
+- name: Ensure UFW rules exist
+  community.general.ufw:
     rule: "{{ item.rule | default('allow') }}"
     port: '{{ item.port }}'
     proto: "{{ item.proto | default('tcp') }}"
-  loop: '{{ ufw_rules }}'
-  when: item.groups | intersect(group_names) | length > 0
+  loop: '{{ (all_ufw_rules + group_ufw_rules | default([])) | unique }}'
 
 - name: Enable UFW
-  ufw:
+  community.general.ufw:
     state: enabled

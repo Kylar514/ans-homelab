@@ -1,8 +1,0 @@
-vip_interface: eth0
-vip_address: 10.0.40.13
-vip_netmask: 28
-vip_master_host: ryze
-vip_priority_master: 100
-vip_priority_backup: 90
-vip_state_master: MASTER
-vip_state_backup: BACKUP

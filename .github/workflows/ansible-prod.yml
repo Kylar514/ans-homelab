@@ -20,48 +20,10 @@ jobs:
           files: |
             playbooks/**
             roles/**
-            !roles/docker_env/templates/**
-            inventories/**/inventory.yml
+            inventories/**
 
       - name: Run site.yml against prod
         if: steps.changed.outputs.any_changed == 'true'
         run: |
-          source ~/.keychain/Azir-sh
-          ansible-playbook playbooks/site.yml --vault-password-file ~/.ansible_vault_pass
-        working-directory: /home/zeal/ans-homelab
-
-      - name: Run site.yml against staging
-        if: steps.changed.outputs.any_changed == 'true'
-        run: |
-          source ~/.keychain/Azir-sh
-          ansible-playbook playbooks/site.yml -i inventories/staging --vault-password-file ~/.ansible_vault_pass
-        working-directory: /home/zeal/ans-homelab
-
-  deploy-env:
-    name: Deploy secrets
-    runs-on: self-hosted
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Check for secret-related changes
-        id: changed
-        uses: tj-actions/changed-files@v44
-        with:
-          files: |
-            inventories/**/vault.yml
-            inventories/**/host_vars/**
-            roles/docker_env/templates/**
-
-      - name: Deploy .env files to prod
-        if: steps.changed.outputs.any_changed == 'true'
-        run: |
-          source ~/.keychain/Azir-sh
-          ansible-playbook playbooks/deploy-env.yml --vault-password-file ~/.ansible_vault_pass
-        working-directory: /home/zeal/ans-homelab
-
-      - name: Deploy .env files to staging
-        if: steps.changed.outputs.any_changed == 'true'
-        run: |
-          source ~/.keychain/Azir-sh
-          ansible-playbook playbooks/deploy-env.yml -i inventories/staging --vault-password-file ~/.ansible_vault_pass
-        working-directory: /home/zeal/ans-homelab
+          ansible-playbook playbooks/site.yml
+        working-directory: /opt/ansible

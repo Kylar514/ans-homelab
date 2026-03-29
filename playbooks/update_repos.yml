@@ -1,9 +1,0 @@
-# SPDX-License-Identifier: MIT-0
----
-# update repos on all servers
-
-- name: update all repos on all servers
-  hosts: all
-  become: true
-  roles:
-    - clone_repos

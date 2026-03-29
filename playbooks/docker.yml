@@ -1,9 +1,0 @@
-# SPDX-License-Identifier: MIT-0
----
-# Installs Docker CE from the official Docker apt repository.
-# Targets hosts in the docker_hosts group only.
-- name: Docker CE setup
-  hosts: docker_hosts
-  become: true
-  roles:
-    - docker

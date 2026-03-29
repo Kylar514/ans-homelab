@@ -5,6 +5,15 @@
 # Mount points are created by the docker role — this role just mounts them.
 # nfs-common is installed via sys_packages base_packages fleet-wide.
 
+- name: Ensure NFS mount directories exist
+  ansible.builtin.file:
+    path: '{{ item.path }}'
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  loop: '{{ nfs_mounts }}'
+
 - name: Mount NFS shares
   ansible.builtin.mount:
     src: '{{ item.src }}'
@@ -13,6 +22,3 @@
     opts: '{{ item.opts }}'
     state: mounted
   loop: '{{ nfs_mounts }}'
-  loop_control:
-    label: '{{ item.path }}'
-  when: "'nfs_clients' in group_names"

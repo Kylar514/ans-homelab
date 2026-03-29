@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: MIT-0
+---
+# Files list
+
+all_files:
+  - src: 'bashrc'
+    dest: '/etc/skel/.bashrc'
+    owner: root
+    group: root
+    mode: 0644
+  - src: 'vimrc'
+    dest: '/etc/skel/.vimrc'
+    owner: root
+    group: root
+    mode: 0644

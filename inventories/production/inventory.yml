@@ -1,64 +1,43 @@
+# SPDX-License-Identifier: MIT-0
 ---
 all:
   hosts:
-    azir:
+    azir-01:
       ansible_host: 10.0.40.11
       ansible_user: zeal
-    ryze:
-      ansible_host: 10.0.40.4
-      ansible_user: zeal
-    zilean:
+    kaiju-01:
       ansible_host: 10.0.40.8
       ansible_user: zeal
-    kennen:
+    corps-01:
       ansible_host: 10.0.40.9
+      ansible_user: zeal
+    corps-02:
+      ansible_host: 10.0.40.10
       ansible_user: zeal
     nasus:
       ansible_host: 10.0.40.3
       ansible_user: zeal
 
   children:
-    docker_hosts:
+    k3s:
       hosts:
-        ryze: {}
-        zilean: {}
-        kennen: {}
+        kaiju-01: {}
+        corps-01: {}
+        corps-02: {}
 
-    traefik_hosts:
+    kaijus:
       hosts:
-        ryze:
-          traefik_role: primary
-        zilean:
-          traefik_role: backup
+        kaiju-01: {}
 
-    vip_failover:
+    corps:
       hosts:
-        ryze: {}
-        zilean: {}
+        corps-01: {}
+        corps-02: {}
 
-    pi_hosts:
-      hosts:
-        ryze: {}
-
-    vm_hosts:
-      hosts:
-        zilean: {}
-        kennen: {}
-
-    nfs_server:
+    storage:
       hosts:
         nasus: {}
 
-    nfs_clients:
-      hosts:
-        ryze: {}
-        zilean: {}
-        kennen: {}
-
     ansible_control:
       hosts:
-        azir: {}
-
-    production:
-      children:
-        docker_hosts: {}
+        azir-01: {}

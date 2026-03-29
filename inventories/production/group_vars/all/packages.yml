@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: MIT-0
+---
+# All Packages
+
+all_packages:
+  - ufw
+  - curl
+  - vim
+  - unattended-upgrades
+  - ca-certificates
+  - gnupg
+  - nfs-common

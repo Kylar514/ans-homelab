@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: MIT-0
+---
+# inventories/production/group_vars/group/nfs.yml
+nfs_server_host: 10.0.40.3
+
+nfs_mounts:
+  - src: '{{ nfs_server_host }}:/home/zeal/data'
+    path: /var/lib/k3s/volumes/slowdata
+    opts: 'rw,sync,hard,intr'
+  - src: '{{ nfs_server_host }}:/srv/fast'
+    path: /var/lib/k3s/volumes/fastdata
+    opts: 'rw,sync,hard,intr'

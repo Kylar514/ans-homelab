@@ -1,7 +1,0 @@
-# SPDX-License-Identifier: MIT-0
----
-# defaults file for set_keychain
-
-keychain_ssh_key: '/home/{{ansible_user}}/.ssh/ansible'
-keychain_pass_file: '/home/{{ansible_user}}/.ansible_vault_pass'
-keychain_askpass_script: '/home/{{ansible_user}}/.ssh/askpass.sh'

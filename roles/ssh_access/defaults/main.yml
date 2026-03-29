@@ -1,8 +1,5 @@
-#SPDX-License-Identifier: MIT-0
+# SPDX-License-Identifier: MIT-0
 ---
-# defaults file for ssh_access
-ssh_users:
-  - name: zeal
-    pubkeys:
-      - homelab.pub
-      - ansible.pub
+# default path to pubkeys
+
+ssh_pubkey_path: '{{ inventory_dir }}/files/pubkeys'

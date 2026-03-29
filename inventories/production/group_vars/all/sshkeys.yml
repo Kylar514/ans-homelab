@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: MIT-0
+---
+# All ssh key users
+
+ssh_users:
+  - name: zeal
+    pubkeys:
+      - homelab.pub
+  - name: ansible
+    pubkeys:
+      - ansible.pub

@@ -1,0 +1,52 @@
+# SPDX-License-Identifier: MIT-0
+---
+- name: Ensure runner directory exists
+  ansible.builtin.file:
+    path: '{{ runner_work_dir }}'
+    state: directory
+    owner: '{{ runner_user }}'
+    group: '{{ runner_user }}'
+    mode: '0755'
+
+- name: Download GitHub Actions runner
+  ansible.builtin.get_url:
+    url: 'https://github.com/actions/runner/releases/download/v2.333.1/actions-runner-linux-x64-2.333.1.tar.gz'
+    dest: '{{ runner_work_dir }}/actions-runner.tar.gz'
+    mode: '0755'
+    owner: '{{ runner_user }}'
+    group: '{{ runner_user }}'
+
+- name: Extract GitHub Actions runner
+  ansible.builtin.unarchive:
+    src: '{{ runner_work_dir }}/actions-runner.tar.gz'
+    dest: '{{ runner_work_dir }}'
+    remote_src: yes
+    owner: '{{ runner_user }}'
+    group: '{{ runner_user }}'
+
+- name: Configure GitHub runner
+  ansible.builtin.command: >
+    ./config.sh
+    --url {{ runner_repo_url }}
+    --token {{ runner_token }}
+    --name {{ runner_name }}
+    --unattended
+    --replace
+  args:
+    chdir: '{{ runner_work_dir }}'
+  become: true
+  become_user: '{{ runner_user }}'
+
+- name: Install and start runner service
+  ansible.builtin.command: ./svc.sh install
+  args:
+    chdir: '{{ runner_work_dir }}'
+  become: true
+  become_user: '{{ runner_user }}'
+
+- name: Start GitHub Actions runner service
+  ansible.builtin.command: ./svc.sh start
+  args:
+    chdir: '{{ runner_work_dir }}'
+  become: true
+  become_user: '{{ runner_user }}'

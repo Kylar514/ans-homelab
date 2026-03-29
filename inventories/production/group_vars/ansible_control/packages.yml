@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: MIT-0
+---
+# All Packages
+
+group_packages:
+  - ansible
+  - git

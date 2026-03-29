@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: MIT-0
+---
+all_users:
+  - name: ansible
+    group: ansible
+    shell: /bin/bash
+    sudo: true

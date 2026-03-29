@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: MIT-0
+---
+# Default settings for unattended-upgrades
+apt_update_period: 1
+apt_download_upgrades: 1
+autoclean_interval: 7
+unattended_upgrade: 1

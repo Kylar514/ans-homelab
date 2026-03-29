@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: MIT-0
+---
+# Ansible ssh key
+
+ansible_key:
+  - src: 'privatekey/ansible'
+    dest: '/home/ansible/.ssh/ansible'
+    owner: ansible
+    group: ansible
+    mode: 0600
