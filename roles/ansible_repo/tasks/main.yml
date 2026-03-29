@@ -1,14 +1,14 @@
 # SPDX-License-Identifier: MIT-0
 ---
-# tasks file for cloneing ansible repo - bootstrap
+# tasks file for cloning ansible repo - bootstrap
 
-- name: Ensure repo directory exists
-  ansible.builtin.file:
-    path: /opt/ansible
-    state: directory
-    owner: ansible
-    group: ansible
-    mode: '0755'
+- name: Mark /opt/ansible as a safe git directory
+  community.general.git_config:
+    name: safe.directory
+    value: /opt/ansible
+    scope: global
+  become: true
+  when: inventory_hostname in groups['ansible_control']
 
 - name: Clone Ansible repository
   ansible.builtin.git:
@@ -18,5 +18,14 @@
     update: yes
     force: yes
   become: true
-  become_method: sudo
+  become_user: root
+  when: inventory_hostname in groups['ansible_control']
+
+- name: Fix ownership of cloned repo
+  ansible.builtin.file:
+    path: /opt/ansible
+    owner: ansible
+    group: ansible
+    recurse: yes
+  become: true
   when: inventory_hostname in groups['ansible_control']

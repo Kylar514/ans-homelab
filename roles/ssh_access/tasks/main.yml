@@ -9,6 +9,7 @@
     owner: '{{ item.name }}'
     group: '{{ item.name }}'
     mode: '0600'
+  become: true
   loop: '{{ ssh_users }}'
   loop_control:
     loop_var: item

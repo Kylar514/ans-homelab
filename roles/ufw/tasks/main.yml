@@ -7,8 +7,11 @@
     rule: "{{ item.rule | default('allow') }}"
     port: '{{ item.port }}'
     proto: "{{ item.proto | default('tcp') }}"
+  become: true
   loop: '{{ (all_ufw_rules + group_ufw_rules | default([])) | unique }}'
+  when: ufw_state | default(true) != 'disabled'
 
 - name: Enable UFW
   community.general.ufw:
-    state: enabled
+    state: "{{ ufw_state | default('enabled')}}"
+  become: true

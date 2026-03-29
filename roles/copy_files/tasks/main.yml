@@ -1,9 +1,7 @@
 # SPDX-License-Identifier: MIT-0
 ---
-# tasks file for server_config
-
 - name: Merge all_files and group_files
-  set_fact:
+  ansible.builtin.set_fact:
     files_to_copy_final: "{{ (all_files | default([])) + (group_files | default([])) | unique(attribute='dest') }}"
 
 - name: Copy files to server
@@ -14,5 +12,4 @@
     group: '{{ item.group }}'
     mode: "{{ item.mode | default('0644') }}"
   loop: '{{ files_to_copy_final }}'
-  loop_control:
-    loop_var: item
+  become: true

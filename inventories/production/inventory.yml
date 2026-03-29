@@ -4,19 +4,14 @@ all:
   hosts:
     azir-01:
       ansible_host: 10.0.40.11
-      ansible_user: zeal
     kaiju-01:
       ansible_host: 10.0.40.8
-      ansible_user: zeal
     corps-01:
       ansible_host: 10.0.40.9
-      ansible_user: zeal
     corps-02:
       ansible_host: 10.0.40.10
-      ansible_user: zeal
     nasus:
       ansible_host: 10.0.40.3
-      ansible_user: zeal
 
   children:
     k3s:

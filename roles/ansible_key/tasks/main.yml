@@ -9,6 +9,7 @@
     owner: '{{ item.owner }}'
     group: '{{ item.group }}'
     mode: "{{ item.mode | default('0644') }}"
+  become: true
   loop: '{{ ansible_key }}'
   loop_control:
     loop_var: item

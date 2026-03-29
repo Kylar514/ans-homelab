@@ -7,9 +7,11 @@
     owner: root
     group: root
     mode: '0644'
+  become: true
 
 - name: Ensure unattended-upgrades service is enabled and running
   ansible.builtin.systemd:
     name: unattended-upgrades
     enabled: yes
     state: started
+  become: true

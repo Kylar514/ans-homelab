@@ -7,46 +7,72 @@
     owner: '{{ runner_user }}'
     group: '{{ runner_user }}'
     mode: '0755'
+  become: true
+  when: runner_user is defined
 
-- name: Download GitHub Actions runner
-  ansible.builtin.get_url:
-    url: 'https://github.com/actions/runner/releases/download/v2.333.1/actions-runner-linux-x64-2.333.1.tar.gz'
-    dest: '{{ runner_work_dir }}/actions-runner.tar.gz'
-    mode: '0755'
-    owner: '{{ runner_user }}'
-    group: '{{ runner_user }}'
+- name: Generate GitHub Actions runner token
+  ansible.builtin.uri:
+    url: 'https://api.github.com/repos/{{ runner_repo_owner }}/{{ runner_repo_name }}/actions/runners/registration-token'
+    method: POST
+    headers:
+      Authorization: 'Bearer {{ gh_pat }}'
+      Accept: 'application/vnd.github+json'
+    status_code: 201
+  register: runner_token_response
+  when: runner_user is defined
 
-- name: Extract GitHub Actions runner
+- name: Download and extract GitHub Actions runner
   ansible.builtin.unarchive:
-    src: '{{ runner_work_dir }}/actions-runner.tar.gz'
+    src: 'https://github.com/actions/runner/releases/download/v2.333.1/actions-runner-linux-x64-2.333.1.tar.gz'
     dest: '{{ runner_work_dir }}'
     remote_src: yes
     owner: '{{ runner_user }}'
     group: '{{ runner_user }}'
+  become: true
+  when: runner_user is defined
 
-- name: Configure GitHub runner
+- name: Configure runner
   ansible.builtin.command: >
     ./config.sh
     --url {{ runner_repo_url }}
-    --token {{ runner_token }}
-    --name {{ runner_name }}
+    --token {{ runner_token_response.json.token }}
+    --name {{ inventory_hostname }}
     --unattended
     --replace
   args:
     chdir: '{{ runner_work_dir }}'
   become: true
   become_user: '{{ runner_user }}'
+  when: runner_user is defined
 
-- name: Install and start runner service
+- name: Fix ownership of runner directory
+  ansible.builtin.file:
+    path: '{{ runner_work_dir }}'
+    owner: '{{ runner_user }}'
+    group: '{{ runner_user }}'
+    recurse: yes
+  become: true
+  when: runner_user is defined
+
+- name: Install runner service
   ansible.builtin.command: ./svc.sh install
   args:
     chdir: '{{ runner_work_dir }}'
   become: true
-  become_user: '{{ runner_user }}'
+  when: runner_user is defined
 
-- name: Start GitHub Actions runner service
-  ansible.builtin.command: ./svc.sh start
-  args:
-    chdir: '{{ runner_work_dir }}'
+- name: Set correct user in runner service file
+  ansible.builtin.lineinfile:
+    path: '/etc/systemd/system/actions.runner.{{ runner_repo_owner }}-{{ runner_repo_name }}.{{ inventory_hostname }}.service'
+    regexp: '^User='
+    line: 'User={{ runner_user }}'
   become: true
-  become_user: '{{ runner_user }}'
+  when: runner_user is defined
+
+- name: Reload systemd and start runner
+  ansible.builtin.systemd:
+    name: 'actions.runner.{{ runner_repo_owner }}-{{ runner_repo_name }}.{{ inventory_hostname }}'
+    daemon_reload: yes
+    state: started
+  become: true
+  when: runner_user is defined

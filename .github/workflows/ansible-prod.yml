@@ -13,17 +13,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check for infrastructure changes
-        id: changed
-        uses: tj-actions/changed-files@v44
-        with:
-          files: |
-            playbooks/**
-            roles/**
-            inventories/**
+      # - name: Check for infrastructure changes
+      #   id: changed
+      #   uses: tj-actions/changed-files@v44
+      #   with:
+      #     files: |
+      #       playbooks/**
+      #       roles/**
+      #       inventories/**
 
       - name: Run site.yml against prod
-        if: steps.changed.outputs.any_changed == 'true'
+        # if: steps.changed.outputs.any_changed == 'true'
         run: |
+          cd ${{ github.workspace }}
           ansible-playbook playbooks/site.yml
-        working-directory: /opt/ansible
