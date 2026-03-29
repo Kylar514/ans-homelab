@@ -3,12 +3,12 @@
 # tasks file for ufw
 
 - name: Ensure UFW rules exist
-  ufw:
+  community.general.ufw:
     rule: "{{ item.rule | default('allow') }}"
     port: '{{ item.port }}'
     proto: "{{ item.proto | default('tcp') }}"
   loop: '{{ (all_ufw_rules + group_ufw_rules | default([])) | unique }}'
 
 - name: Enable UFW
-  ufw:
+  community.general.ufw:
     state: enabled

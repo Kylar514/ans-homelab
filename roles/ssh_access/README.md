@@ -15,6 +15,6 @@ ssh_users:
       - homelab.pub
 ```
 
-- Users lists are located in
-  `inventories/production/group_vars/all/sshkey_*.yml`
+- Users lists are located in `inventories/production/group_vars/all/sshkey.yml`
+  & `inventories/production/group_vars/group/sshkey.yml`
 - Pubkeys are located in `inventories/production/files/pubkeys/*.pub`

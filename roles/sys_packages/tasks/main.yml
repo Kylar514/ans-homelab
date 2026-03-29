@@ -1,10 +1,10 @@
-#SPDX-License-Identifier: MIT-0
+# SPDX-License-Identifier: MIT-0
 ---
 # tasks file for sys_packages
 
 - name: Ensure required packages are installed
-  package:
+  ansible.builtin.package:
     name: '{{ item }}'
     state: present
     update_cache: yes
-  loop: '{{ (packages_all + packages_group | default([])) | unique }}'
+  loop: '{{ (all_packages + group_packages | default([])) | unique }}'
