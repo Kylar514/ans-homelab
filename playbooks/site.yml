@@ -6,7 +6,6 @@
   hosts: all
   become: true
   roles:
-  roles:
     - timezone
     - users
     - ssh_access

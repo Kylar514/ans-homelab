@@ -4,6 +4,8 @@
 
 ssh_users:
   - name: zeal
+    pubkeys:
       - homelab.pub
   - name: azir
+    pubkeys:
       - ansible.pub
