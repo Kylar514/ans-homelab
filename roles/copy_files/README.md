@@ -15,7 +15,7 @@ all_files:
     dest: '/etc/skel/.bashrc'
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
 
 group_files:
   - src: 'vimrc'

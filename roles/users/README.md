@@ -14,6 +14,9 @@ all_users:
     group: ansible
     shell: bash
     sudo: true
+    groups: # optional additional groups
+      - 1
+      - 2
 
 group_users_rules:
   - name: k3s
