@@ -9,6 +9,7 @@ on:
 jobs:
   site:
     name: Run site.yml
+
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
@@ -24,6 +25,11 @@ jobs:
 
       - name: Run site.yml against prod
         # if: steps.changed.outputs.any_changed == 'true'
+        env:
+          VAULT_ADDR: ${{ vars.VAULT_ADDR }}
+          VAULT_ROLE_ID: ${{ vars.VAULT_ROLE_ID }}
+          VAULT_SECRET_ID: ${{ secrets.VAULT_SECRET_ID }}
+
         run: |
           cd ${{ github.workspace }}
           ansible-playbook playbooks/site.yml

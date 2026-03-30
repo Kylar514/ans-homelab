@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: MIT-0
+---
+# Base system configuration applied to all managed hosts.
+
+- name: Base system setup
+  hosts: ansible_control
+  roles:
+    - ufw
+    - vault

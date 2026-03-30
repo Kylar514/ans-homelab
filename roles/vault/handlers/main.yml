@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: MIT-0
+---
+- name: Restart vault
+  ansible.builtin.systemd:
+    name: vault
+    state: restarted
+  become: true

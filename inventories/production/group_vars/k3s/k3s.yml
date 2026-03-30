@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: MIT-0
+---
+k3s_version: 'v1.32.2+k3s1'
+k3s_server_ip: '10.0.40.8'
+k3s_token: "{{ lookup('community.hashi_vault.hashi_vault',
+  'secret=secret/data/k3s:token
+  auth_method=approle
+  role_id=' ~ lookup('env', 'VAULT_ROLE_ID') ~ '
+  secret_id=' ~ lookup('env', 'VAULT_SECRET_ID') ~ '
+  url=' ~ lookup('env', 'VAULT_ADDR')) }}"
