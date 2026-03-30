@@ -4,11 +4,37 @@
 # Ansible runs this from azir-01 using kubernetes.core.helm.
 # ArgoCD then takes over all application deployments via GitOps.
 
+- name: Add Helm GPG key
+  ansible.builtin.shell:
+    cmd: >
+      curl -fsSL https://packages.buildkite.com/helm-linux/helm-debian/gpgkey |
+      gpg --dearmor -o /usr/share/keyrings/helm.gpg
+    creates: /usr/share/keyrings/helm.gpg
+  become: true
+  when: inventory_hostname in groups['ansible_control']
+
+- name: Add Helm apt repository
+  ansible.builtin.apt_repository:
+    repo: 'deb [signed-by=/usr/share/keyrings/helm.gpg] https://packages.buildkite.com/helm-linux/helm-debian/any/ any main'
+    state: present
+    filename: helm-stable-debian
+  become: true
+  when: inventory_hostname in groups['ansible_control']
+
+- name: Install helm
+  ansible.builtin.package:
+    name: helm
+    state: present
+    update_cache: true
+  become: true
+  when: inventory_hostname in groups['ansible_control']
+
 - name: Add ArgoCD helm repository
   kubernetes.core.helm_repository:
     name: argo
     repo_url: https://argoproj.github.io/argo-helm
   become: false
+  when: inventory_hostname in groups['ansible_control']
 
 - name: Install ArgoCD
   kubernetes.core.helm:
@@ -18,3 +44,4 @@
     create_namespace: true
     wait: true
   become: false
+  when: inventory_hostname in groups['ansible_control']
