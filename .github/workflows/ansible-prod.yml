@@ -23,6 +23,11 @@ jobs:
       #       roles/**
       #       inventories/**
 
+      - name: Install Ansible collections
+        run: |
+          cd ${{ github.workspace }}
+          ansible-galaxy collection install -r requirements.yml
+
       - name: Run site.yml against prod
         # if: steps.changed.outputs.any_changed == 'true'
         env:
