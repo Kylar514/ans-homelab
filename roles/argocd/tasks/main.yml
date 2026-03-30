@@ -1,0 +1,20 @@
+# SPDX-License-Identifier: MIT-0
+---
+# Installs ArgoCD via Helm onto the k3s cluster.
+# Ansible runs this from azir-01 using kubernetes.core.helm.
+# ArgoCD then takes over all application deployments via GitOps.
+
+- name: Add ArgoCD helm repository
+  kubernetes.core.helm_repository:
+    name: argo
+    repo_url: https://argoproj.github.io/argo-helm
+  become: false
+
+- name: Install ArgoCD
+  kubernetes.core.helm:
+    name: argocd
+    chart_ref: argo/argo-cd
+    release_namespace: argocd
+    create_namespace: true
+    wait: true
+  become: false
