@@ -6,7 +6,7 @@
 #   proto:  Protocol ('tcp' or 'udp'), defaults to 'tcp'
 #   rule:   'allow' or 'deny', defaults to 'allow'
 
-groups_ufw_rules:
+group_ufw_rules:
   # Allow API Server
   - port: 6443
     proto: tcp
