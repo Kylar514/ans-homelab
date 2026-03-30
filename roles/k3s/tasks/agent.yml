@@ -1,0 +1,35 @@
+# SPDX-License-Identifier: MIT-0
+---
+# Installs k3s in agent mode on worker nodes (corps-01, corps-02).
+# Joins the cluster using the server IP and shared token.
+# Server must be up and API reachable on 6443 before this runs.
+
+- name: Verify k3s server API is reachable before joining
+  ansible.builtin.wait_for:
+    host: '{{ k3s_server_ip }}'
+    port: 6443
+    timeout: 60
+
+- name: Download k3s install script
+  ansible.builtin.get_url:
+    url: https://get.k3s.io
+    dest: /tmp/k3s_install.sh
+    mode: '0755'
+  become: true
+
+- name: Install k3s agent
+  ansible.builtin.shell:
+    cmd: sh /tmp/k3s_install.sh agent
+    creates: /etc/systemd/system/k3s-agent.service
+  environment:
+    INSTALL_K3S_VERSION: '{{ k3s_version }}'
+    K3S_URL: 'https://{{ k3s_server_ip }}:6443'
+    K3S_TOKEN: '{{ k3s_token }}'
+  become: true
+
+- name: Ensure k3s-agent service is started and enabled
+  ansible.builtin.systemd:
+    name: k3s-agent
+    state: started
+    enabled: true
+  become: true

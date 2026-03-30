@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: MIT-0
+---
+# Installs and configures k3s. Delegates to server.yml for the control
+# plane (kaijus) and agent.yml for worker nodes (corps).
+# Server must be fully up before agents attempt to join.
+
+- name: Configure k3s server (control plane)
+  ansible.builtin.import_tasks: server.yml
+  when: inventory_hostname in groups['kaijus']
+
+- name: Configure k3s agents (workers)
+  ansible.builtin.import_tasks: agent.yml
+  when: inventory_hostname in groups['corps']

@@ -1,0 +1,34 @@
+# SPDX-License-Identifier: MIT-0
+---
+# Installs k3s in server mode on the control plane node (kaiju-01).
+# Idempotent via 'creates' — won't reinstall if service file already exists.
+
+- name: Download k3s install script
+  ansible.builtin.get_url:
+    url: https://get.k3s.io
+    dest: /tmp/k3s_install.sh
+    mode: '0755'
+  become: true
+
+- name: Install k3s server
+  ansible.builtin.shell:
+    cmd: sh /tmp/k3s_install.sh
+    creates: /etc/systemd/system/k3s.service
+  environment:
+    INSTALL_K3S_VERSION: '{{ k3s_version }}'
+    K3S_TOKEN: '{{ k3s_token }}'
+  become: true
+
+- name: Ensure k3s service is started and enabled
+  ansible.builtin.systemd:
+    name: k3s
+    state: started
+    enabled: true
+  become: true
+
+- name: Wait for k3s API to be ready
+  ansible.builtin.wait_for:
+    host: localhost
+    port: 6443
+    timeout: 60
+  become: true
