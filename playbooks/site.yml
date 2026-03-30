@@ -13,3 +13,4 @@
     - ufw
     - nfs_client
     - unattended_upgrades
+    - k3s
