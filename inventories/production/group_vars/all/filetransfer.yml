@@ -7,39 +7,39 @@ all_files:
     dest: '/etc/skel/.bashrc'
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
   - src: 'vimrc'
     dest: '/etc/skel/.vimrc'
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
   - src: 'bashrc'
     dest: '/etc/bash.bashrc' # system-wide bashrc for all users
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
   - src: 'vimrc'
     dest: '/etc/vim/vimrc' # system-wide vimrc for all users
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
   - src: 'bashrc'
     dest: '/home/zeal/.bashrc'
     owner: zeal
     group: zeal
-    mode: 0644
+    mode: '0644'
   - src: 'vimrc'
     dest: '/home/zeal/.vimrc'
     owner: zeal
     group: zeal
-    mode: 0644
+    mode: '0644'
   - src: 'bashrc'
     dest: '/home/ansible/.bashrc'
     owner: ansible
     group: ansible
-    mode: 0644
+    mode: '0644'
   - src: 'vimrc'
     dest: '/home/ansible/.vimrc'
     owner: ansible
     group: ansible
-    mode: 0644
+    mode: '0644'
