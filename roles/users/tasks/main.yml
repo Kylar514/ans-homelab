@@ -30,6 +30,17 @@
   loop_control:
     loop_var: item
 
+- name: Ensure users are added to additional groups
+  ansible.builtin.user:
+    name: '{{ item.name }}'
+    groups: '{{ item.groups | default(omit) }}'
+    append: yes
+  become: true
+  loop: '{{ final_users }}'
+  loop_control:
+    loop_var: item
+  when: item.groups is defined and item.groups
+
 - name: Ensure SSH directory exists for user
   ansible.builtin.file:
     path: '/home/{{ item.name }}/.ssh'

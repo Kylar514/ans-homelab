@@ -5,3 +5,9 @@ all_users:
     group: ansible
     shell: /bin/bash
     sudo: true
+  - name: zeal
+    group: zeal
+    shell: /bin/bash
+    sudo: true
+    groups:
+      - ansible
