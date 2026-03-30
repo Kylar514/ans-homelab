@@ -6,4 +6,4 @@ group_packages:
   - ansible
   - git
   - python3-hvac
-  - kubectl
+  - python3-kubernetes
