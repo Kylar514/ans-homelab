@@ -43,5 +43,17 @@
     release_namespace: argocd
     create_namespace: true
     wait: true
+    values:
+      repoServer:
+        livenessProbe:
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 30
+          failureThreshold: 10
+        readinessProbe:
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 30
+          failureThreshold: 10
   become: false
   when: inventory_hostname in groups['ansible_control']
