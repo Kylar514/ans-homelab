@@ -15,3 +15,12 @@ group_ufw_rules:
   - port: 443
     proto: tcp
     rule: allow
+  - port: 8472
+    proto: udp
+    rule: allow
+  - src: '10.42.0.0/16' #k3s pod cidr
+    rule: allow
+    proto: any
+  - src: '10.43.0.0/16' #k3s service cidr
+    rule: allow
+    proto: any

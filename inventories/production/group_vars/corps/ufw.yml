@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: MIT-0
+---
+# UFW rules for this host/group.
+# Each entry supports:
+#   port:   The port number to allow/deny
+#   proto:  Protocol ('tcp' or 'udp'), defaults to 'tcp'
+#   rule:   'allow' or 'deny', defaults to 'allow'
+
+- port: 8472
+  proto: udp
+  rule: allow
+- src: '10.42.0.0/16' #k3s pod cidr
+  rule: allow
+  proto: any
+- src: '10.43.0.0/16' #k3s service cidr
+  rule: allow
+  proto: any
