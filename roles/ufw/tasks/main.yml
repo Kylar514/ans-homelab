@@ -5,11 +5,18 @@
 - name: Ensure UFW rules exist
   community.general.ufw:
     rule: "{{ item.rule | default('allow') }}"
-    port: '{{ item.port }}'
+    port: '{{ item.port | default(omit) }}'
     proto: "{{ item.proto | default('tcp') }}"
+    src: '{{ item.src | default(omit) }}'
   become: true
   loop: '{{ (all_ufw_rules + group_ufw_rules | default([])) | unique }}'
   when: ufw_state | default(true) != 'disabled'
+
+- name: Set default routed policy
+  community.general.ufw:
+    default: "{{ ufw_default_routed | default('deny') }}"
+    direction: routed
+  become: true
 
 - name: Enable UFW
   community.general.ufw:
