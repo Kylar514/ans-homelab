@@ -55,5 +55,8 @@
           periodSeconds: 30
           timeoutSeconds: 30
           failureThreshold: 10
+        server:
+          extraArgs:
+            - --insecure
   become: false
   when: inventory_hostname in groups['ansible_control']
