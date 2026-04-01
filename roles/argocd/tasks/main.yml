@@ -58,5 +58,7 @@
       server:
         extraArgs:
           - --insecure
+      global:
+        domain: argocd.thenasus.com
   become: false
   when: inventory_hostname in groups['ansible_control']
