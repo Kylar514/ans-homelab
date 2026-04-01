@@ -7,19 +7,21 @@
 #   rule:   'allow' or 'deny', defaults to 'allow'
 #   src:    '10.43/0.0/16'
 
-ufw_default_routed: 'allow'
+# TODO update group_ufw_rules to be additive.
 
-group_ufw_rules:
-  # Allow Kubelet API
-  - port: 10250
-    proto: tcp
-    rule: allow
-  - port: 8472
-    proto: udp
-    rule: allow
-  - src: '10.42.0.0/16' #k3s pod cidr
-    rule: allow
-    proto: any
-  - src: '10.43.0.0/16' #k3s service cidr
-    rule: allow
-    proto: any
+# ufw_default_routed: 'allow'
+
+# group_ufw_rules:
+# Allow Kubelet API
+# - port: 10250
+#   proto: tcp
+#   rule: allow
+# - port: 8472
+#   proto: udp
+#   rule: allow
+# - src: '10.42.0.0/16' #k3s pod cidr
+#   rule: allow
+#   proto: any
+# - src: '10.43.0.0/16' #k3s service cidr
+#   rule: allow
+#   proto: any
