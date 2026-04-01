@@ -36,6 +36,17 @@
   become: false
   when: inventory_hostname in groups['ansible_control']
 
+- name: Ensure ArgoCD styles configmap exists
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: argocd-styles
+        namespace: argocd
+  when: inventory_hostname in groups['ansible_control']
+
 - name: Install ArgoCD
   kubernetes.core.helm:
     name: argocd
@@ -55,9 +66,9 @@
           periodSeconds: 30
           timeoutSeconds: 30
           failureThreshold: 10
-      # server:
-      #   extraArgs:
-      #     - --insecure
+      server:
+        extraArgs:
+          - --insecure
       global:
         domain: argocd.thenasus.com
   become: false
