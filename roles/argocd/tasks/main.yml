@@ -55,9 +55,9 @@
           periodSeconds: 30
           timeoutSeconds: 30
           failureThreshold: 10
-      server:
-        extraArgs:
-          - --insecure
+      # server:
+      #   extraArgs:
+      #     - --insecure
       global:
         domain: argocd.thenasus.com
   become: false
