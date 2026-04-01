@@ -18,3 +18,9 @@ group_ufw_rules:
   - src: '10.43.0.0/16' #k3s service cidr
     rule: allow
     proto: any
+  - port: '30000:32767'
+    proto: tcp
+    rule: allow
+  - port: '30000:32767'
+    proto: udp
+    rule: allow
